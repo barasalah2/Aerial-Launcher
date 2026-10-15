@@ -9,6 +9,41 @@
 > - None developer of this application is associated with Epic Games.
 > - **_Since this project is Open-Source, be careful if you download the installer for a version from sources other than this repository, those other sources may have malicious code_**.
 
+## About this fork
+
+This is [barasalah2/Aerial-Launcher](https://github.com/barasalah2/Aerial-Launcher), a fork of [Ciensprog/Aerial-Launcher](https://github.com/Ciensprog/Aerial-Launcher) 1.12.3. It fixes what broke with the Epic Games Launcher v2 update (October 2026) and adds features from [Mikro900ytpl's fork](https://github.com/Mikro900ytpl/Aerial-Launcher), which were reviewed and hardened before merging.
+
+**Download:** `Aerial.Launcher-1.13.0.Setup.exe` from this fork's [releases](https://github.com/barasalah2/Aerial-Launcher/releases). It uses the same data folder as the original (`%APPDATA%\aerial-launcher-data`), so your accounts and settings carry over.
+
+> [!IMPORTANT]
+> Keep **Epic Games Launcher running** when you launch Fortnite from Aerial. With EGL v2 the game needs it, and Aerial tells you if it isn't running.
+
+### Fixes
+
+- **"UE::IoStore::SignatureError (Pak is invalid)" when launching:** Aerial now passes the `-eglv2` arguments the game needs since the EGL v2 update.
+- **Empty Home and Alerts:** Epic stopped accepting the app-level token for mission alerts, so they're now loaded with your first account. Home shows an error instead of an empty day if loading fails.
+- **Detect path and game version:** both are read from EGL v2's install list, since its old files are gone.
+- **Launch errors say why:** game not found in the path, Epic Games Launcher not running, or sign-in failed.
+- **Settings turned "auto daily quests" back on when saving:** fixed.
+- **Disabled account selectors could still be cleared:** fixed.
+
+### New features
+
+- **Llama Manager:** per-account llama shop, opening packs and choice packs, plus bulk Mini and Upgrade llama purchases across accounts. Every purchase asks for confirmation with the total cost. V-Bucks offers can't be bought here.
+- **Collection Book:** level heroes, schematics, defenders and survivors to a target level, and slot items into the Collection Book. Slotting is permanent, so it always asks first, and favorited items are never slotted.
+- **Item Shop:** browse the Battle Royale shop, set a creator code, buy and gift items. The confirmation shows the total across all selected accounts, and every offer is checked against Epic's own catalog and price before anything is sent.
+- **Party friend requests:** look up players (Epic, PSN, Xbox, Nintendo, Steam) and send or accept friend requests per account.
+- **Games Launcher:** launch your other installed Epic games with a selected account. Fortnite and Unreal Engine are excluded.
+
+### Privacy
+
+- Aerial talks to Epic's own servers (`*.epicgames.com`).
+- The only other service it contacts is [fortnite-api.com](https://fortnite-api.com), for the public Item Shop list and item icons. No account data, tokens or names are sent there.
+- Everything Aerial saves stays in `%APPDATA%\aerial-launcher-data`.
+
+> [!NOTE]
+> The in-app "new version" notice checks the original repository, not this fork.
+
 # Aerial Launcher
 
 A Windows desktop application (based on Potato Launcher) to manage things on Fortnite STW.
