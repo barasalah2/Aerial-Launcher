@@ -149,7 +149,7 @@ export function useDropzoneConfig() {
             const { worldInfo } = worlInfoParser(result)
 
             initPagination(worldInfo.keys().toArray())
-            setWorldInfoData(worldInfo)
+            setWorldInfoData(worldInfo, false)
           } catch (error) {
             toast(t('world-info.notifications.error'), {
               duration: 5000,

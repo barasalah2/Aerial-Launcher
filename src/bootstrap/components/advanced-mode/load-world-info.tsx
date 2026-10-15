@@ -44,11 +44,13 @@ export function LoadHomeWorldInfo() {
     const listener = window.electronAPI.responseHomeWorldInfo(
       async (response) => {
         try {
-          const result = worldInfoSchema.parse(response) as WorldInfoData
+          const result = worldInfoSchema.parse(
+            response.data
+          ) as WorldInfoData
           const { worldInfo } = worlInfoParser(result)
 
           initPagination(worldInfo.keys().toArray())
-          setWorldInfoData(worldInfo)
+          setWorldInfoData(worldInfo, false)
 
           // eslint-disable-next-line @typescript-eslint/no-unused-vars
         } catch (error) {
@@ -56,7 +58,7 @@ export function LoadHomeWorldInfo() {
             defaultWorldInfo as WorldInfoData
           )
 
-          setWorldInfoData(worldInfo)
+          setWorldInfoData(worldInfo, true)
         } finally {
           updateWorldInfoLoading('isFetching', false)
           updateWorldInfoLoading('isReloading', false)
