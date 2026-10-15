@@ -7,7 +7,6 @@ import type {
   WorldInfoOpenResponse,
   WorldInfoResponse,
 } from '../../types/data/advanced-mode/world-info'
-import type { WorldInfoData } from '../../types/services/advanced-mode/world-info'
 
 import { ipcRenderer } from 'electron'
 
@@ -53,9 +52,12 @@ export function renameWorldInfoFile(
 }
 
 export function responseHomeWorldInfo(
-  callback: (value: WorldInfoData) => Promise<void>
+  callback: (value: WorldInfoResponse) => Promise<void>
 ) {
-  const customCallback = (_: IpcRendererEvent, value: WorldInfoData) => {
+  const customCallback = (
+    _: IpcRendererEvent,
+    value: WorldInfoResponse
+  ) => {
     callback(value).catch(() => {})
   }
   const rendererInstance = ipcRenderer.on(

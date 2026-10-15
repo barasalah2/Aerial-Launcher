@@ -4,7 +4,6 @@ import type {
   WorldInfoExportResponse,
   WorldInfoFileData,
   WorldInfoOpenResponse,
-  WorldInfoParsed,
   WorldInfoResponse,
 } from '../../types/data/advanced-mode/world-info'
 
@@ -22,64 +21,28 @@ import { dialog, shell } from 'electron'
 
 import { defaultWorldInfo } from '../../config/constants/fortnite/world-info'
 import { ElectronAPIEventKeys } from '../../config/constants/main-process'
-import { defaultFortniteClient } from '../../config/fortnite/clients'
 
 import { MainWindow } from '../startup/windows/main'
+import { AccountsManager } from '../startup/accounts'
 import { DataDirectory } from '../startup/data-directory'
+import { Authentication } from './authentication'
 
 import { getWorldInfoData } from '../../services/endpoints/advanced-mode/world-info'
-import { createAccessTokenUsingClientCredentials } from '../../services/endpoints/oauth'
 
 import { localeCompareForSorting } from '../../lib/utils'
 
 export class WorldInfoManager {
   static async requestForHome() {
-    try {
-      const response = await WorldInfoManager.request()
-
-      MainWindow.instance.webContents.send(
-        ElectronAPIEventKeys.HomeWorldInfoResponse,
-        response as WorldInfoParsed
-      )
-
-      return
-
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    } catch (error) {
-      //
-    }
-
     MainWindow.instance.webContents.send(
       ElectronAPIEventKeys.HomeWorldInfoResponse,
-      defaultWorldInfo
+      await WorldInfoManager.request()
     )
   }
 
   static async requestForAdvanceSection() {
-    try {
-      const response = await WorldInfoManager.request()
-
-      MainWindow.instance.webContents.send(
-        ElectronAPIEventKeys.WorldInfoResponseData,
-        {
-          data: response,
-          status: true,
-        } as WorldInfoResponse
-      )
-
-      return
-
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    } catch (error) {
-      //
-    }
-
     MainWindow.instance.webContents.send(
       ElectronAPIEventKeys.WorldInfoResponseData,
-      {
-        data: null,
-        status: false,
-      } as WorldInfoResponse
+      await WorldInfoManager.request()
     )
   }
 
@@ -341,35 +304,37 @@ export class WorldInfoManager {
     )
   }
 
-  private static async request() {
+  /**
+   * Epic rejects client credentials tokens on world/info
+   */
+  private static async request(): Promise<WorldInfoResponse> {
     try {
-      const accessToken = await createAccessTokenUsingClientCredentials({
-        authorization: defaultFortniteClient.use.auth,
-      })
+      const account = AccountsManager.getAccounts().first()
+      const accessToken = account
+        ? await Authentication.verifyAccessToken(account)
+        : null
 
-      if (!accessToken.data.access_token) {
-        return defaultWorldInfo
+      if (!accessToken) {
+        return { data: null, status: false }
       }
 
-      const worldInfoResponse = await getWorldInfoData({
-        accessToken: accessToken.data.access_token,
-      })
+      const worldInfoResponse = await getWorldInfoData({ accessToken })
 
       if (
         worldInfoResponse.data.missionAlerts?.length <= 0 ||
         worldInfoResponse.data.missions?.length <= 0 ||
         worldInfoResponse.data.theaters?.length <= 0
       ) {
-        return defaultWorldInfo
+        return { data: defaultWorldInfo, status: true }
       }
 
-      return worldInfoResponse.data
+      return { data: worldInfoResponse.data, status: true }
 
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (error) {
       //
     }
 
-    return defaultWorldInfo
+    return { data: null, status: false }
   }
 }

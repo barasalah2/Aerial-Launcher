@@ -80,6 +80,7 @@
     }
   },
   "results": {
+    "fetch-error": "Couldn't load mission alerts. Check that an account is added, then refresh.",
     "empty": {
       "alerts-done": "Found alerts do not match with any of today's missions",
       "vbucks": "No V-Bucks today",

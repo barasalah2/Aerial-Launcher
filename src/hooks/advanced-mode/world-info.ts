@@ -8,6 +8,7 @@ export function useWorldInfo() {
   return useWorldInfoStore(
     useShallow((state) => ({
       data: state.data,
+      hasError: state.hasError,
       isFetching: state.isFetching,
       isReloading: state.isReloading,
     }))
