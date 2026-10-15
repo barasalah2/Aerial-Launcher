@@ -49,7 +49,7 @@ This is [barasalah2/Aerial-Launcher](https://github.com/barasalah2/Aerial-Launch
 A Windows desktop application (based on Potato Launcher) to manage things on Fortnite STW.
 
 <p align="center">
-  <img src="./app-preview.jpg" />
+  <img src="./app-preview.png" />
 </p>
 
 ## Development Motivation (Lore)
