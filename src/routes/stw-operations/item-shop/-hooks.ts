@@ -133,19 +133,24 @@ export function useItemShopPage() {
       async (payload) => {
         setActing(false)
         const ok = payload.results.filter((item) => item.success).length
+        const failed = payload.results.find((item) => !item.success)
 
         if (payload.gifts.length > 0) {
           useItemShopStore.getState().prependGifts(payload.gifts)
         }
 
-        toast(
-          t(
-            ok > 0
-              ? 'item-shop.purchase-success'
-              : 'item-shop.purchase-error',
-            { count: ok }
+        if (ok > 0) {
+          toast(t('item-shop.purchase-success', { count: ok }))
+        }
+
+        if (failed) {
+          toast(
+            t('item-shop.purchase-error', {
+              error: failed.errorMessage ?? failed.error,
+            })
           )
-        )
+        }
+
         setBuyOffer(null)
 
         if (selectedAccountData.length > 0) {
@@ -157,7 +162,7 @@ export function useItemShopPage() {
     const giftListener = window.electronAPI.itemShopGiftResult(
       async (payload) => {
         setActing(false)
-        const ok = payload.results.filter((item) => item.success).length
+        const failed = payload.results.find((item) => !item.success)
 
         if (payload.gifts.length > 0) {
           useItemShopStore.getState().prependGifts(payload.gifts)
@@ -172,14 +177,16 @@ export function useItemShopPage() {
               })
             )
           })
-        } else {
+        }
+
+        if (failed) {
           toast(
-            t(
-              ok > 0 ? 'item-shop.gift-success' : 'item-shop.gift-error',
-              { count: ok }
-            )
+            t('item-shop.gift-error', {
+              error: failed.errorMessage ?? failed.error,
+            })
           )
         }
+
         setGiftOffer(null)
         setGiftLookup(null)
         setGiftSearch('')
@@ -261,8 +268,6 @@ export function useItemShopPage() {
       offerTitle: buyOffer.title,
       imageUrl: buyOffer.imageUrl,
       expectedTotalPrice: buyOffer.price,
-      currencyType: buyOffer.currencyType,
-      currencySubType: buyOffer.currencySubType,
     })
   }
 
@@ -299,8 +304,6 @@ export function useItemShopPage() {
       imageUrl: giftOffer.imageUrl,
       iconFile: giftOffer.iconFile,
       expectedTotalPrice: giftOffer.price,
-      currencyType: giftOffer.currencyType,
-      currencySubType: giftOffer.currencySubType,
       receiverAccountId: giftLookup.data.lookup.id,
       receiverDisplayName: giftLookup.data.lookup.displayName,
     })

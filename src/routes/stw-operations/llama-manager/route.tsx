@@ -92,8 +92,18 @@ export const Route = createRoute({
   },
 })
 
+function getCurrencyName(offer: LlamaManagerShopOffer) {
+  return offer.currencySubType
+    ? parseResource({
+        key: offer.currencySubType,
+        quantity: offer.price,
+      }).name
+    : offer.currencyType
+}
+
 function Content() {
   const { t } = useTranslation(['stw-operations'])
+  const { accountList } = useGetAccounts()
 
   const {
     accountOptions,
@@ -108,6 +118,8 @@ function Content() {
     bulkUpgradeQty,
     choiceDialog,
     manualSelectionIdx,
+    buyConfirm,
+    bulkConfirm,
 
     updateAccounts,
     updateTags,
@@ -116,10 +128,13 @@ function Content() {
     setBulkMiniQty,
     setBulkUpgradeQty,
     setManualSelectionIdx,
+    setBuyConfirm,
+    setBulkConfirm,
     handleLoad,
     handlePurchase,
-    handleBulkPurchaseMini,
-    handleBulkPurchaseUpgrade,
+    confirmPurchase,
+    handleBulkPurchase,
+    confirmBulkPurchase,
     handleOpenAll,
     handleOpenTemplate,
     handleOpenGroup,
@@ -184,7 +199,7 @@ function Content() {
                     size="sm"
                     className="flex-1 h-8"
                     variant="secondary"
-                    onClick={handleBulkPurchaseMini}
+                    onClick={() => handleBulkPurchase('mini')}
                     disabled={isDisabledForm}
                   >
                     {isActing ? (
@@ -213,7 +228,7 @@ function Content() {
                   <Button
                     size="sm"
                     className="flex-1 h-8"
-                    onClick={handleBulkPurchaseUpgrade}
+                    onClick={() => handleBulkPurchase('upgrade')}
                     disabled={isDisabledForm}
                   >
                     {isActing ? (
@@ -360,6 +375,118 @@ function Content() {
               ) : (
                 t('llama-manager.choice.confirm')
               )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog
+        open={buyConfirm !== null}
+        onOpenChange={(open) => {
+          if (!open) setBuyConfirm(null)
+        }}
+      >
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>{t('llama-manager.confirm.buy-title')}</DialogTitle>
+            {buyConfirm && (
+              <DialogDescription>
+                {t('llama-manager.confirm.buy', {
+                  count: buyConfirm.quantity,
+                  name: buyConfirm.offer.title,
+                  account: parseCustomDisplayName(
+                    accountList[buyConfirm.accountId],
+                  ),
+                })}
+              </DialogDescription>
+            )}
+          </DialogHeader>
+
+          {buyConfirm && (
+            <p className="text-sm">
+              {buyConfirm.offer.isFree
+                ? t('llama-manager.confirm.price-free')
+                : t('llama-manager.confirm.price', {
+                    price: numberWithCommaSeparator(buyConfirm.offer.price),
+                    total: numberWithCommaSeparator(
+                      buyConfirm.offer.price * buyConfirm.quantity,
+                    ),
+                    currency: getCurrencyName(buyConfirm.offer),
+                  })}
+            </p>
+          )}
+
+          <DialogFooter className="gap-2 sm:gap-0">
+            <Button
+              variant="outline"
+              onClick={() => setBuyConfirm(null)}
+            >
+              {t('llama-manager.confirm.cancel')}
+            </Button>
+            <Button
+              onClick={confirmPurchase}
+              disabled={isActing}
+            >
+              {t('llama-manager.confirm.confirm')}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog
+        open={bulkConfirm !== null}
+        onOpenChange={(open) => {
+          if (!open) setBulkConfirm(null)
+        }}
+      >
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>{t('llama-manager.confirm.bulk-title')}</DialogTitle>
+            {bulkConfirm && (
+              <DialogDescription>
+                {t('llama-manager.confirm.bulk', {
+                  count: bulkConfirm.quantity,
+                  name: bulkConfirm.offer.title,
+                  accounts: bulkConfirm.accountIds.length,
+                })}
+              </DialogDescription>
+            )}
+          </DialogHeader>
+
+          {bulkConfirm && (
+            <div className="grid gap-2 text-sm">
+              <p>
+                {t('llama-manager.confirm.bulk-price', {
+                  price: numberWithCommaSeparator(bulkConfirm.offer.price),
+                  perAccount: numberWithCommaSeparator(
+                    bulkConfirm.offer.price * bulkConfirm.quantity,
+                  ),
+                  total: numberWithCommaSeparator(
+                    bulkConfirm.offer.price *
+                      bulkConfirm.quantity *
+                      bulkConfirm.accountIds.length,
+                  ),
+                  currency: getCurrencyName(bulkConfirm.offer),
+                })}
+              </p>
+              <p className="text-muted-foreground text-xs">
+                {t('llama-manager.confirm.bulk-cap')}
+              </p>
+            </div>
+          )}
+
+          <DialogFooter className="gap-2 sm:gap-0">
+            <Button
+              variant="outline"
+              onClick={() => setBulkConfirm(null)}
+            >
+              {t('llama-manager.confirm.cancel')}
+            </Button>
+            <Button
+              onClick={confirmBulkPurchase}
+              disabled={isActing}
+            >
+              {t('llama-manager.confirm.confirm')}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -645,12 +772,7 @@ function AccountLlamaPanel({
                       ? Math.max(offer.remaining, 1)
                       : 999
                   const qty = getQuantity(qtyKey, 1)
-                  const currencyName = offer.currencySubType
-                    ? parseResource({
-                        key: offer.currencySubType,
-                        quantity: offer.price,
-                      }).name
-                    : offer.currencyType
+                  const isVBucks = offer.currencyType === 'MtxCurrency'
 
                   return (
                     <div
@@ -684,7 +806,7 @@ function AccountLlamaPanel({
                                   price: numberWithCommaSeparator(
                                     offer.price,
                                   ),
-                                  currency: currencyName,
+                                  currency: getCurrencyName(offer),
                                 })}
                             {offer.remaining !== null && (
                               <>
@@ -715,14 +837,16 @@ function AccountLlamaPanel({
                           />
                           <Button
                             size="sm"
-                            disabled={isActing}
+                            disabled={isActing || isVBucks}
                             onClick={() =>
                               onPurchase(data.accountId, offer)
                             }
                           >
-                            {t('llama-manager.shop.buy', {
-                              count: qty,
-                            })}
+                            {isVBucks
+                              ? t('llama-manager.shop.vbucks')
+                              : t('llama-manager.shop.buy', {
+                                  count: qty,
+                                })}
                           </Button>
                         </div>
                       </div>

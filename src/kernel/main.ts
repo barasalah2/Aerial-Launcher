@@ -150,17 +150,6 @@ void (() => {
       mainWindow.webContents.setUserAgent(manifest.UserAgent)
     }
 
-    const browserUserAgent =
-      'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36'
-
-    mainWindow.webContents.session.webRequest.onBeforeSendHeaders(
-      { urls: ['https://fortnite-api.com/*'] },
-      (details, callback) => {
-        details.requestHeaders['User-Agent'] = browserUserAgent
-        callback({ requestHeaders: details.requestHeaders })
-      },
-    )
-
     MainWindow.setInstance(mainWindow)
 
     // and load the index.html of the app.
@@ -437,8 +426,8 @@ void (() => {
 
     ipcMain.on(
       ElectronAPIEventKeys.GamesLauncherStart,
-      async (_, payload) => {
-        await GamesLauncher.launch(payload.account, payload.game)
+      async (_, account: AccountData, appName: string) => {
+        await GamesLauncher.launch(account, appName)
       },
     )
 

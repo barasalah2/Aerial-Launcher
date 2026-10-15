@@ -23,7 +23,6 @@ export const useSettingsStore = create<SettingsState>()(
     customProcess: '',
     missionInterval: '',
     path: '',
-    epicGamesDir: 'C:\\Program Files\\Epic Games',
     systemTray: false,
     userAgent: '',
 
@@ -48,10 +47,6 @@ export const useSettingsStore = create<SettingsState>()(
 
       if (settings.path !== undefined) {
         newData.path = settings.path
-      }
-
-      if (settings.epicGamesDir !== undefined) {
-        newData.epicGamesDir = settings.epicGamesDir
       }
 
       if (settings.systemTray !== undefined) {

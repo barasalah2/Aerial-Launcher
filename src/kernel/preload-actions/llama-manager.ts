@@ -27,16 +27,6 @@ export function llamaManagerBulkPurchase(data: LlamaManagerBulkPurchaseRequest) 
   ipcRenderer.send(ElectronAPIEventKeys.LlamaManagerBulkPurchase, data)
 }
 
-/** @deprecated use llamaManagerBulkPurchase */
-export function llamaManagerBulkPurchaseMini(
-  data: LlamaManagerBulkPurchaseRequest,
-) {
-  ipcRenderer.send(ElectronAPIEventKeys.LlamaManagerBulkPurchase, {
-    ...data,
-    kind: data.kind ?? 'mini',
-  })
-}
-
 export function llamaManagerOpenPacks(data: LlamaManagerOpenRequest) {
   ipcRenderer.send(ElectronAPIEventKeys.LlamaManagerOpenPacks, data)
 }
@@ -68,6 +58,3 @@ export const llamaManagerBulkResult = createElectronNotification<
 >({
   key: ElectronAPIEventKeys.LlamaManagerBulkResult,
 })
-
-/** @deprecated use llamaManagerBulkResult */
-export const llamaManagerBulkMiniResult = llamaManagerBulkResult

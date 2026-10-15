@@ -36,6 +36,14 @@ import {
   CardHeader,
   CardTitle,
 } from '../../../components/ui/card'
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '../../../components/ui/dialog'
 import { Input } from '../../../components/ui/input'
 import { Label } from '../../../components/ui/label'
 import { Badge } from '../../../components/ui/badge'
@@ -126,6 +134,7 @@ function Content() {
     tagOptions,
     accountsData,
     targetLevel,
+    pendingAction,
 
     updateAccounts,
     updateTags,
@@ -134,8 +143,9 @@ function Content() {
     handleUpgradeAll,
     handleUpgradeSection,
     handleUpgradeItem,
-    handleSlotItem,
-    handleSlotSection,
+    handleSlotItems,
+    confirmPendingAction,
+    cancelPendingAction,
   } = useCollectionBookPage()
 
   const presets = [10, 20, 30, 40, 50]
@@ -240,14 +250,57 @@ function Content() {
                   onUpgradeAll={handleUpgradeAll}
                   onUpgradeSection={handleUpgradeSection}
                   onUpgradeItem={handleUpgradeItem}
-                  onSlotItem={handleSlotItem}
-                  onSlotSection={handleSlotSection}
+                  onSlotItems={handleSlotItems}
                 />
               ))}
             </div>
           )}
         </div>
       </div>
+
+      <Dialog
+        open={pendingAction !== null}
+        onOpenChange={(open) => {
+          if (!open) cancelPendingAction()
+        }}
+      >
+        {pendingAction && (
+          <DialogContent className="max-w-md">
+            <DialogHeader>
+              <DialogTitle>
+                {t(`collection-book.confirm.${pendingAction.type}.title`)}
+              </DialogTitle>
+              <DialogDescription>
+                {pendingAction.type === 'slot'
+                  ? t('collection-book.confirm.slot.description', {
+                      count: pendingAction.request.itemIds.length,
+                    })
+                  : t('collection-book.confirm.upgrade.description', {
+                      count: pendingAction.count,
+                      level: pendingAction.request.targetLevel,
+                    })}
+              </DialogDescription>
+            </DialogHeader>
+            <DialogFooter className="gap-2 sm:gap-0">
+              <Button
+                variant="outline"
+                onClick={cancelPendingAction}
+              >
+                {t('collection-book.confirm.cancel')}
+              </Button>
+              <Button
+                variant={
+                  pendingAction.type === 'slot' ? 'destructive' : 'default'
+                }
+                disabled={isActing}
+                onClick={confirmPendingAction}
+              >
+                {t('collection-book.confirm.confirm')}
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        )}
+      </Dialog>
 
       <GoToTop containerId="collection-book-card" />
     </>
@@ -261,8 +314,7 @@ function AccountCollectionPanel({
   onUpgradeAll,
   onUpgradeSection,
   onUpgradeItem,
-  onSlotItem,
-  onSlotSection,
+  onSlotItems,
 }: {
   data: CollectionBookAccountData
   targetLevel: number
@@ -273,10 +325,9 @@ function AccountCollectionPanel({
     sectionId: CollectionBookSectionId,
   ) => void
   onUpgradeItem: (accountId: string, item: CollectionBookItem) => void
-  onSlotItem: (accountId: string, itemId: string) => void
-  onSlotSection: (
+  onSlotItems: (
     accountId: string,
-    sectionId: CollectionBookSectionId,
+    items: Array<CollectionBookItem>,
   ) => void
 }) {
   const { t } = useTranslation(['stw-operations'])
@@ -531,10 +582,11 @@ function AccountCollectionPanel({
                             size="sm"
                             variant="outline"
                             disabled={
-                              isActing || section.items.length <= 0
+                              isActing ||
+                              section.items.every((item) => item.favorite)
                             }
                             onClick={() =>
-                              onSlotSection(data.accountId, section.id)
+                              onSlotItems(data.accountId, section.items)
                             }
                           >
                             {t('collection-book.actions.slot-section')}
@@ -587,6 +639,11 @@ function AccountCollectionPanel({
                                         })}
                                       </span>
                                       <span>{item.rarity}</span>
+                                      {item.favorite && (
+                                        <span className="text-amber-600 dark:text-amber-400">
+                                          {t('collection-book.item.favorite')}
+                                        </span>
+                                      )}
                                     </div>
                                     <div className="bg-muted h-1 overflow-hidden rounded-full w-full max-w-[10rem]">
                                       <div
@@ -622,12 +679,9 @@ function AccountCollectionPanel({
                                     size="sm"
                                     variant="outline"
                                     className="h-8"
-                                    disabled={isActing}
+                                    disabled={isActing || item.favorite}
                                     onClick={() =>
-                                      onSlotItem(
-                                        data.accountId,
-                                        item.itemId,
-                                      )
+                                      onSlotItems(data.accountId, [item])
                                     }
                                   >
                                     {t('collection-book.item.slot')}

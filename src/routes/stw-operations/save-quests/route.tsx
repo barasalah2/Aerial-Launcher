@@ -168,7 +168,6 @@ function AutoDailyQuestsSwitch() {
       customProcess: settings.customProcess,
       missionInterval: settings.missionInterval,
       path: settings.path,
-      epicGamesDir: settings.epicGamesDir,
       systemTray: settings.systemTray,
       userAgent: settings.userAgent,
     }

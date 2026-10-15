@@ -29,7 +29,6 @@ export type CollectionBookItem = {
   starTier: number
   rarity: string
   favorite: boolean
-  isSlotted: boolean
   imageUrl?: string
 }
 

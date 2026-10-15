@@ -27,6 +27,9 @@
   "gift": "Gift",
   "confirm-buy": "Buy {{name}}",
   "confirm-gift": "Gift {{name}}",
+  "confirm-buy-accounts": "One confirm buys this item once on each of the {{count}} selected account(s): {{names}}",
+  "confirm-gift-accounts": "One confirm sends this gift once from each of the {{count}} selected account(s): {{names}}",
+  "confirm-total": "Total: {{count}} × {{price}} = {{total}} V-Bucks",
   "price": "{{price}} V-Bucks",
   "accounts": "Buyers",
   "receiver": "Receiver",
@@ -34,8 +37,7 @@
   "message": "Gift message",
   "not-giftable": "This item cannot be gifted",
   "purchase-success": "Purchased on {{count}} account(s)",
-  "purchase-error": "Purchase failed on some accounts",
-  "gift-success": "Gift sent from {{count}} account(s)",
-  "gift-error": "Gift failed on some accounts",
+  "purchase-error": "Purchase failed on some accounts ({{error}})",
+  "gift-error": "Gift failed on some accounts ({{error}})",
   "owned-vbucks": "{{name}}: {{amount}} V"
 }

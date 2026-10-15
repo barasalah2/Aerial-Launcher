@@ -11,6 +11,7 @@ import { useGetAccounts } from '../../../hooks/accounts'
 
 import { toast } from '../../../lib/notifications'
 import type {
+  LlamaManagerBulkKind,
   LlamaManagerInventoryPack,
   LlamaManagerShopOffer,
 } from '../../../types/llama-manager'
@@ -19,7 +20,7 @@ export function useLlamaManagerPage() {
   const { t } = useTranslation(['stw-operations', 'general'])
 
   const { accountsArray } = useGetAccounts()
-  const { accounts, tags, isLoading, isActing, data, lastResult } =
+  const { accounts, tags, isLoading, isActing, data } =
     useGetLlamaManagerData()
   const {
     updateAccounts,
@@ -52,6 +53,17 @@ export function useLlamaManagerPage() {
     accountId: string
   } | null>(null)
   const [manualSelectionIdx, setManualSelectionIdx] = useState(0)
+  const [buyConfirm, setBuyConfirm] = useState<{
+    accountId: string
+    offer: LlamaManagerShopOffer
+    quantity: number
+  } | null>(null)
+  const [bulkConfirm, setBulkConfirm] = useState<{
+    kind: LlamaManagerBulkKind
+    offer: LlamaManagerShopOffer
+    quantity: number
+    accountIds: Array<string>
+  } | null>(null)
 
   const isDisabledForm =
     isSelectedEmpty || isLoading || isActing || !areThereAccounts
@@ -182,7 +194,7 @@ export function useLlamaManagerPage() {
     accountId: string,
     offer: LlamaManagerShopOffer,
   ) => {
-    if (isActing) return
+    if (isActing || offer.currencyType === 'MtxCurrency') return
 
     const key = `${accountId}:shop:${offer.offerId}`
     const max =
@@ -190,6 +202,14 @@ export function useLlamaManagerPage() {
         ? Math.max(offer.remaining, 1)
         : 9999
     const quantity = Math.min(getQuantity(key, 1), max)
+
+    setBuyConfirm({ accountId, offer, quantity })
+  }
+
+  const confirmPurchase = () => {
+    if (!buyConfirm || isActing) return
+
+    const { accountId, offer, quantity } = buyConfirm
 
     updateActing(true)
     window.electronAPI.llamaManagerPurchase({
@@ -200,9 +220,10 @@ export function useLlamaManagerPage() {
       expectedTotalPrice: offer.price * quantity,
       currencyType: offer.currencyType,
     })
+    setBuyConfirm(null)
   }
 
-  const handleBulkPurchase = (kind: 'mini' | 'upgrade') => {
+  const handleBulkPurchase = (kind: LlamaManagerBulkKind) => {
     if (isActing) return
 
     const selected = getAccounts()
@@ -211,18 +232,42 @@ export function useLlamaManagerPage() {
       return
     }
 
+    // The price shown in the confirmation comes from loaded shop data
+    if (accountsData.length <= 0) {
+      toast(t('llama-manager.bulk.load-first'))
+      return
+    }
+
+    const offer = accountsData
+      .flatMap((accountData) => accountData.shop)
+      .find((shopOffer) => shopOffer.bulkKind === kind)
+
+    if (!offer) {
+      toast(t(`llama-manager.toasts.error_no-${kind}-offer`))
+      return
+    }
+
     const raw = kind === 'upgrade' ? bulkUpgradeQty : bulkMiniQty
-    const quantity = Math.max(1, Math.floor(raw || 1))
-    updateActing(true)
-    window.electronAPI.llamaManagerBulkPurchase({
-      accountIds: selected.map((account) => account.accountId),
-      quantity,
+    setBulkConfirm({
       kind,
+      offer,
+      quantity: Math.max(1, Math.floor(raw || 1)),
+      accountIds: selected.map((account) => account.accountId),
     })
   }
 
-  const handleBulkPurchaseMini = () => handleBulkPurchase('mini')
-  const handleBulkPurchaseUpgrade = () => handleBulkPurchase('upgrade')
+  const confirmBulkPurchase = () => {
+    if (!bulkConfirm || isActing) return
+
+    updateActing(true)
+    window.electronAPI.llamaManagerBulkPurchase({
+      accountIds: bulkConfirm.accountIds,
+      quantity: bulkConfirm.quantity,
+      kind: bulkConfirm.kind,
+      price: bulkConfirm.offer.price,
+    })
+    setBulkConfirm(null)
+  }
 
   const handleOpenGroup = (
     accountId: string,
@@ -343,21 +388,19 @@ export function useLlamaManagerPage() {
 
   return {
     accountOptions,
-    areThereAccounts,
     isDisabledForm,
     isLoading,
     isActing,
-    isSelectedEmpty,
     parsedSelectedAccounts,
     parsedSelectedTags,
     tagOptions,
     accountsData,
-    lastResult,
-    quantities,
     bulkMiniQty,
     bulkUpgradeQty,
     choiceDialog,
     manualSelectionIdx,
+    buyConfirm,
+    bulkConfirm,
 
     updateAccounts,
     updateTags,
@@ -366,10 +409,13 @@ export function useLlamaManagerPage() {
     setBulkMiniQty,
     setBulkUpgradeQty,
     setManualSelectionIdx,
+    setBuyConfirm,
+    setBulkConfirm,
     handleLoad,
     handlePurchase,
-    handleBulkPurchaseMini,
-    handleBulkPurchaseUpgrade,
+    confirmPurchase,
+    handleBulkPurchase,
+    confirmBulkPurchase,
     handleOpenAll,
     handleOpenTemplate,
     handleOpenGroup,

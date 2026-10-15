@@ -1,3 +1,5 @@
+import type { AccountData } from '../../../types/accounts'
+
 import { UpdateIcon } from '@radix-ui/react-icons'
 import { createRoute } from '@tanstack/react-router'
 import { ShoppingBag } from 'lucide-react'
@@ -121,7 +123,10 @@ function Content() {
       <div className="flex flex-grow">
         <div className="flex flex-col gap-4 w-full px-2 pb-6">
           <Card className="w-full shadow-sm">
-            <CardHeader className="border-b space-y-2 py-4">
+            <CardHeader
+              className="border-b space-y-2 py-4"
+              id="item-shop-card-header"
+            >
               <CardTitle className="flex gap-2 items-center text-lg">
                 <span className="bg-primary/10 flex p-1.5 rounded-md">
                   <ShoppingBag className="size-5 text-primary" />
@@ -273,7 +278,7 @@ function Content() {
           )}
         </div>
       </div>
-      <GoToTop />
+      <GoToTop containerId="item-shop-card-header" />
 
       <Dialog
         open={buyOffer !== null}
@@ -292,16 +297,18 @@ function Content() {
             </DialogTitle>
           </DialogHeader>
           {buyOffer && (
-            <div className="text-sm text-muted-foreground">
-              {t('item-shop.price', {
-                price: numberWithCommaSeparator(buyOffer.price),
-              })}
-            </div>
+            <ConfirmCost
+              accountsKey="item-shop.confirm-buy-accounts"
+              accounts={selectedAccountData}
+              price={buyOffer.price}
+            />
           )}
           <DialogFooter>
             <Button
               onClick={handleBuy}
-              disabled={isActing || !buyOffer}
+              disabled={
+                isActing || !buyOffer || selectedAccountData.length <= 0
+              }
             >
               {isActing ? (
                 <UpdateIcon className="animate-spin" />
@@ -370,13 +377,21 @@ function Content() {
               )}
             </form>
           )}
+          {giftOffer?.giftable && (
+            <ConfirmCost
+              accountsKey="item-shop.confirm-gift-accounts"
+              accounts={selectedAccountData}
+              price={giftOffer.price}
+            />
+          )}
           <DialogFooter>
             <Button
               onClick={handleGift}
               disabled={
                 isActing ||
                 !giftOffer?.giftable ||
-                !giftLookup?.success
+                !giftLookup?.success ||
+                selectedAccountData.length <= 0
               }
             >
               {isActing ? (
@@ -389,5 +404,35 @@ function Content() {
         </DialogContent>
       </Dialog>
     </>
+  )
+}
+
+function ConfirmCost({
+  accounts,
+  accountsKey,
+  price,
+}: {
+  accounts: Array<AccountData>
+  accountsKey: string
+  price: number
+}) {
+  const { t } = useTranslation(['stw-operations'])
+
+  return (
+    <div className="space-y-1 text-muted-foreground text-sm">
+      <div>
+        {t(accountsKey, {
+          count: accounts.length,
+          names: accounts.map(parseCustomDisplayName).join(', '),
+        })}
+      </div>
+      <div className="font-medium text-foreground">
+        {t('item-shop.confirm-total', {
+          count: accounts.length,
+          price: numberWithCommaSeparator(price),
+          total: numberWithCommaSeparator(price * accounts.length),
+        })}
+      </div>
+    </div>
   )
 }

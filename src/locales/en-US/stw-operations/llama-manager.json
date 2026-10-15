@@ -1,15 +1,15 @@
 {
   "title": "Llama Manager",
   "description": "Buy shop llamas in any quantity, open unopened inventory llamas in bulk, and handle choice packs (CP) with manual selection from the launcher.",
-  "note": "Shop includes Upgrade / Super Ranged X-Ray llamas and daily event llamas (Mini Reward, Troll Stash, Rad, etc.). Inventory covers unopened Lunar, Holiday, Rad and other stored llamas.",
   "form": {
     "load": "Load llamas"
   },
   "bulk": {
     "mini": "Mini ×{{count}}",
     "upgrade": "Upgrade ×{{count}}",
-    "mini-hint": "Buy Mini Reward Llamas on all selected accounts (voucher_basicpack)",
-    "upgrade-hint": "Buy Upgrade / X-Ray llamas on all selected accounts (50 X-Ray tickets each)"
+    "mini-hint": "Buy Mini Llamas (paid with Mini Llama tokens) on all selected accounts",
+    "upgrade-hint": "Buy Upgrade Llamas (paid with X-Ray tickets) on all selected accounts",
+    "load-first": "Load llamas first so the offer and its price can be shown"
   },
   "tabs": {
     "inventory": "Inventory",
@@ -30,7 +30,20 @@
     "price-free": "Free",
     "price": "{{price}} {{currency}}",
     "remaining": "{{count}} left",
-    "buy": "Buy {{count}}"
+    "buy": "Buy {{count}}",
+    "vbucks": "V-Bucks offer"
+  },
+  "confirm": {
+    "buy-title": "Confirm purchase",
+    "buy": "Buy {{count}} × {{name}} on {{account}}.",
+    "price": "Price: {{price}} {{currency}} each, {{total}} {{currency}} in total.",
+    "price-free": "Price: free.",
+    "bulk-title": "Confirm bulk purchase",
+    "bulk": "Buy up to {{count}} × {{name}} on each of {{accounts}} account(s).",
+    "bulk-price": "Price: {{price}} {{currency}} each, up to {{perAccount}} {{currency}} per account ({{total}} {{currency}} in total).",
+    "bulk-cap": "Each account buys only what its balance and daily limit allow. Accounts where the offer or price differs are skipped.",
+    "cancel": "Cancel",
+    "confirm": "Buy"
   },
   "choice": {
     "hint": "Choice packs (CP) let you pick a specific reward. Select options in the dialog or open with the default index.",
@@ -62,6 +75,8 @@
     "error": "Action failed ({{context}})",
     "error_auth": "Authentication failed",
     "error_purchase": "Purchase failed",
+    "error_price": "The offer price changed. Load llamas again and retry",
+    "error_vbucks": "V-Bucks offers can't be bought from the Llama Manager",
     "error_open": "Could not open packs",
     "error_open-choice": "Could not open choice pack",
     "error_account": "Account not found",

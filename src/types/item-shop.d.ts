@@ -52,8 +52,6 @@ export type ItemShopPurchaseRequest = {
   offerTitle: string
   imageUrl: string | null
   expectedTotalPrice: number
-  currencyType: string
-  currencySubType: string
 }
 
 export type ItemShopGiftRequest = {
@@ -63,8 +61,6 @@ export type ItemShopGiftRequest = {
   imageUrl: string | null
   iconFile?: string | null
   expectedTotalPrice: number
-  currencyType: string
-  currencySubType: string
   receiverAccountId: string
   receiverDisplayName: string
   personalMessage?: string

@@ -183,11 +183,55 @@ function entryIconUrl(entry: FortniteApiShopEntry) {
     entry.newDisplayAsset?.renderImages?.[0]?.image ??
     null
 
-  if (image && image.startsWith('https://')) {
+  if (image && image.startsWith('https://fortnite-api.com/')) {
     return image
   }
 
   return null
+}
+
+// The offerId and price come from fortnite-api.com, so only send them to
+// Epic if this account's own storefront catalog has the same offer and price.
+async function verifyEpicOffer(
+  accessToken: string,
+  offerId: string,
+  confirmedPrice: number
+) {
+  const catalog = await getCatalog({ accessToken })
+  const storefronts = (catalog.data.storefronts ?? []) as Array<RawStorefront>
+
+  for (const storefront of storefronts) {
+    if (SKIP_STOREFRONTS.has(storefront.name ?? '')) {
+      continue
+    }
+
+    const entry = storefront.catalogEntries?.find(
+      (item) => item.offerId === offerId
+    )
+    const price = entry?.prices?.find(
+      (item) => item.currencyType === 'MtxCurrency'
+    )
+
+    if (entry?.offerId && typeof price?.finalPrice === 'number') {
+      if (price.finalPrice !== confirmedPrice) {
+        return {
+          offer: null,
+          error: `epic_price_${price.finalPrice}_not_${confirmedPrice}`,
+        }
+      }
+
+      return {
+        offer: {
+          offerId: entry.offerId,
+          price: price.finalPrice,
+          currencySubType: price.currencySubType ?? '',
+        },
+        error: null,
+      }
+    }
+  }
+
+  return { offer: null, error: 'offer_not_in_epic_catalog' }
 }
 
 function offersFromPublicShop(
@@ -561,6 +605,19 @@ export class ItemShop {
             return
           }
 
+          const { offer, error } = await verifyEpicOffer(
+            accessToken,
+            request.offerId,
+            request.expectedTotalPrice
+          )
+
+          if (!offer) {
+            result.error = 'catalog'
+            result.errorMessage = error
+            results.push(result)
+            return
+          }
+
           try {
             await storeRequestAccess({
               accessToken,
@@ -576,10 +633,10 @@ export class ItemShop {
           await purchaseCatalogEntry({
             accessToken,
             accountId: account.accountId,
-            offerId: request.offerId,
-            currency: request.currencyType,
-            currencySubType: request.currencySubType,
-            expectedTotalPrice: request.expectedTotalPrice,
+            offerId: offer.offerId,
+            currency: 'MtxCurrency',
+            currencySubType: offer.currencySubType,
+            expectedTotalPrice: offer.price,
             purchaseQuantity: 1,
             gameContext: '',
           })
@@ -597,13 +654,13 @@ export class ItemShop {
             fromDisplayName: displayName,
             toAccountId: account.accountId,
             toDisplayName: displayName,
-            offerId: request.offerId,
+            offerId: offer.offerId,
             title: request.offerTitle,
             imageUrl:
               request.imageUrl?.startsWith('https://')
                 ? request.imageUrl
                 : null,
-            price: request.expectedTotalPrice,
+            price: offer.price,
             creatorCode: info.affiliate,
           })
         } catch (error) {
@@ -649,16 +706,29 @@ export class ItemShop {
             return
           }
 
+          const { offer, error } = await verifyEpicOffer(
+            accessToken,
+            request.offerId,
+            request.expectedTotalPrice
+          )
+
+          if (!offer) {
+            result.error = 'catalog'
+            result.errorMessage = error
+            results.push(result)
+            return
+          }
+
           const info = await ItemShop.fetchAccountInfo(account)
 
           await giftCatalogEntry({
             accessToken,
             accountId: account.accountId,
-            offerId: request.offerId,
+            offerId: offer.offerId,
             receiverAccountIds: [request.receiverAccountId],
-            expectedTotalPrice: request.expectedTotalPrice,
-            currency: request.currencyType,
-            currencySubType: request.currencySubType,
+            expectedTotalPrice: offer.price,
+            currency: 'MtxCurrency',
+            currencySubType: offer.currencySubType,
             purchaseQuantity: 1,
             personalMessage: request.personalMessage ?? '',
           })
@@ -674,13 +744,13 @@ export class ItemShop {
             fromDisplayName: parseCustomDisplayName(account),
             toAccountId: request.receiverAccountId,
             toDisplayName: request.receiverDisplayName,
-            offerId: request.offerId,
+            offerId: offer.offerId,
             title: request.offerTitle,
             imageUrl: request.imageUrl?.startsWith('https://')
               ? request.imageUrl
               : null,
             iconFile: request.iconFile ?? null,
-            price: request.expectedTotalPrice,
+            price: offer.price,
             creatorCode: info.affiliate,
           })
         } catch (error) {

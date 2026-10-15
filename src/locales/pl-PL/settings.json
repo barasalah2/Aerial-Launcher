@@ -19,9 +19,6 @@
       "path": {
         "label": "Niestandardowa ścieżka"
       },
-      "epic-games-dir": {
-        "label": "Folder Epic Games"
-      },
       "user-agent": {
         "label": "Niestandardowy User Agent",
         "note": "Jest stosowany tylko wtedy, gdy nie masz zainstalowanego Fortnite."

@@ -57,7 +57,6 @@ export function registerItemShopScheme() {
         secure: true,
         supportFetchAPI: true,
         corsEnabled: true,
-        bypassCSP: true,
         stream: true,
       },
     },
@@ -92,12 +91,12 @@ async function loadIcon(id: string) {
         responseType: 'arraybuffer',
         timeout: 8000,
       })
-      const bytes = Buffer.from(response.data)
+      const bytes = new Uint8Array(response.data)
 
       await mkdir(iconsDir(), { recursive: true })
       await writeFile(filePath, bytes)
 
-      return new Response(new Uint8Array(bytes), {
+      return new Response(bytes, {
         headers: {
           'content-type': 'image/png',
           'cache-control': 'public, max-age=86400',

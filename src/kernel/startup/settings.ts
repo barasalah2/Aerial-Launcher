@@ -95,8 +95,6 @@ export class SettingsManager {
         result.settings.missionInterval ??
         defaultSettingsData.missionInterval,
       path: result.settings.path ?? defaultSettingsData.path,
-      epicGamesDir:
-        result.settings.epicGamesDir ?? defaultSettingsData.epicGamesDir,
       systemTray:
         result.settings.systemTray ?? defaultSettingsData.systemTray,
       userAgent:
@@ -106,18 +104,12 @@ export class SettingsManager {
     return settings
   }
 
-  static async update(settings: Partial<Settings>) {
-    const currentSettings = await SettingsManager.getData()
-    const mergedSettings: Required<Settings> = {
-      ...currentSettings,
-      ...settings,
-    }
-
+  static async update(settings: Settings) {
     if (
-      mergedSettings.systemTray !== undefined &&
-      SystemTray.isActive !== mergedSettings.systemTray
+      settings.systemTray !== undefined &&
+      SystemTray.isActive !== settings.systemTray
     ) {
-      SystemTray.setIsActive(mergedSettings.systemTray)
+      SystemTray.setIsActive(settings.systemTray)
 
       if (SystemTray.isActive) {
         SystemTray.create({
@@ -130,13 +122,13 @@ export class SettingsManager {
       }
     }
 
-    CustomProcess.setName(mergedSettings.customProcess)
+    CustomProcess.setName(settings.customProcess)
 
-    await DataDirectory.updateSettingsFile(mergedSettings)
+    await DataDirectory.updateSettingsFile(settings)
 
     MainWindow.instance.webContents.send(
       ElectronAPIEventKeys.OnLoadSettings,
-      mergedSettings,
+      settings,
     )
   }
 

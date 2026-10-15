@@ -38,11 +38,6 @@ export const settingsSchema = z.object({
     range: missionIntervalRange,
   }),
   path: z.string().trim().min(1),
-  epicGamesDir: z
-    .string()
-    .trim()
-    .min(1)
-    .default('C:\\Program Files\\Epic Games'),
   systemTray: z.boolean().default(false),
   userAgent: z.string().trim().min(1),
 })

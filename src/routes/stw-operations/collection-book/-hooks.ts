@@ -1,4 +1,4 @@
-import { useEffect, useMemo } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import { useAccountSelectorData } from '../../../components/selectors/accounts/hooks'
@@ -13,7 +13,13 @@ import { toast } from '../../../lib/notifications'
 import type {
   CollectionBookItem,
   CollectionBookSectionId,
+  CollectionBookSlotRequest,
+  CollectionBookUpgradeRequest,
 } from '../../../types/collection-book'
+
+type CollectionBookPendingAction =
+  | { type: 'slot'; request: CollectionBookSlotRequest }
+  | { type: 'upgrade'; count: number; request: CollectionBookUpgradeRequest }
 
 export function useCollectionBookPage() {
   const { t } = useTranslation(['stw-operations', 'general'])
@@ -51,6 +57,9 @@ export function useCollectionBookPage() {
     selectedAccounts: accounts,
     selectedTags: tags,
   })
+
+  const [pendingAction, setPendingAction] =
+    useState<CollectionBookPendingAction | null>(null)
 
   const isDisabledForm =
     isSelectedEmpty || isLoading || isActing || !areThereAccounts
@@ -132,70 +141,77 @@ export function useCollectionBookPage() {
     window.electronAPI.collectionBookRequestData(selected)
   }
 
+  // Uses the same filter as the main process so the confirmation count matches
+  const requestUpgrade = (
+    request: CollectionBookUpgradeRequest,
+    items: Array<CollectionBookItem>,
+  ) => {
+    const count = items.filter(
+      (item) => item.level < targetLevel && item.level < item.maxLevel,
+    ).length
+
+    if (isActing || count <= 0) return
+
+    setPendingAction({ type: 'upgrade', count, request })
+  }
+
   const handleUpgradeAll = (accountId: string) => {
-    if (isActing) return
-    updateActing(true)
-    window.electronAPI.collectionBookUpgrade({
-      accountId,
-      sectionId: 'all',
-      targetLevel,
-    })
+    requestUpgrade(
+      { accountId, sectionId: 'all', targetLevel },
+      data[accountId]?.items ?? [],
+    )
   }
 
   const handleUpgradeSection = (
     accountId: string,
     sectionId: CollectionBookSectionId,
   ) => {
-    if (isActing) return
-    updateActing(true)
-    window.electronAPI.collectionBookUpgrade({
-      accountId,
-      sectionId,
-      targetLevel,
-    })
+    requestUpgrade(
+      { accountId, sectionId, targetLevel },
+      (data[accountId]?.items ?? []).filter(
+        (item) => item.sectionId === sectionId,
+      ),
+    )
   }
 
   const handleUpgradeItem = (
     accountId: string,
     item: CollectionBookItem,
   ) => {
-    if (isActing) return
-    updateActing(true)
-    window.electronAPI.collectionBookUpgrade({
-      accountId,
-      itemIds: [item.itemId],
-      targetLevel,
-    })
+    requestUpgrade({ accountId, itemIds: [item.itemId], targetLevel }, [
+      item,
+    ])
   }
 
-  const handleSlotItem = (accountId: string, itemId: string) => {
-    if (isActing) return
-    updateActing(true)
-    window.electronAPI.collectionBookSlot({
-      accountId,
-      itemIds: [itemId],
-    })
-  }
-
-  const handleSlotSection = (
+  const handleSlotItems = (
     accountId: string,
-    sectionId: CollectionBookSectionId,
+    items: Array<CollectionBookItem>,
   ) => {
-    if (isActing) return
-    const accountData = data[accountId]
-    if (!accountData) return
-
-    const itemIds = accountData.items
-      .filter((item) => item.sectionId === sectionId)
+    const itemIds = items
+      .filter((item) => !item.favorite)
       .map((item) => item.itemId)
 
-    if (itemIds.length <= 0) return
+    if (isActing || itemIds.length <= 0) return
+
+    setPendingAction({ type: 'slot', request: { accountId, itemIds } })
+  }
+
+  const confirmPendingAction = () => {
+    if (!pendingAction || isActing) return
 
     updateActing(true)
-    window.electronAPI.collectionBookSlot({
-      accountId,
-      itemIds,
-    })
+
+    if (pendingAction.type === 'slot') {
+      window.electronAPI.collectionBookSlot(pendingAction.request)
+    } else {
+      window.electronAPI.collectionBookUpgrade(pendingAction.request)
+    }
+
+    setPendingAction(null)
+  }
+
+  const cancelPendingAction = () => {
+    setPendingAction(null)
   }
 
   return {
@@ -211,6 +227,7 @@ export function useCollectionBookPage() {
     accountsData,
     lastResult,
     targetLevel,
+    pendingAction,
 
     updateAccounts,
     updateTags,
@@ -219,7 +236,8 @@ export function useCollectionBookPage() {
     handleUpgradeAll,
     handleUpgradeSection,
     handleUpgradeItem,
-    handleSlotItem,
-    handleSlotSection,
+    handleSlotItems,
+    confirmPendingAction,
+    cancelPendingAction,
   }
 }

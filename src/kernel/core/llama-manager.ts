@@ -39,11 +39,6 @@ import {
 import { getDateWithDefaultFormat } from '../../lib/dates'
 import { getKey } from '../../lib/parsers/resources'
 
-const SHOP_STOREFRONTS = [
-  'CardPackStorePreroll',
-  'CardPackStoreGameplay',
-] as const
-
 const BATCH_OPEN_SIZE = 50
 
 function humanizeTemplateId(templateId: string) {
@@ -86,118 +81,33 @@ function isChoicePackTemplate(templateId: string) {
   )
 }
 
-/** Mini Reward Llama — bought with voucher_basicpack tokens. */
-function isMiniRewardLlamaOffer(offer: LlamaManagerShopOffer) {
-  const sub = (offer.currencySubType ?? '').toLowerCase()
-  const title = (offer.title ?? '').toLowerCase()
-  const dev = (offer.devName ?? '').toLowerCase()
-  const grants = offer.itemGrants.map((g) => g.templateId.toLowerCase())
+/**
+ * Exact match for the offers the bulk buttons buy: Mini Llama (paid with
+ * voucher_basicpack) and Upgrade Llama Always.UpgradePack.01 (paid with
+ * X-Ray tickets). Anything else is not bought in bulk.
+ */
+function bulkKindForOffer(
+  devName: string,
+  {
+    currencyType,
+    currencySubType,
+    finalPrice,
+  }: { currencyType: string; currencySubType: string; finalPrice: number },
+): LlamaManagerBulkKind | undefined {
+  if (currencyType !== 'GameItem' || finalPrice <= 0) {
+    return
+  }
 
-  if (sub.includes('voucher_basicpack')) {
-    return true
+  if (currencySubType === 'AccountResource:voucher_basicpack') {
+    return 'mini'
   }
 
   if (
-    title.includes('mini reward') ||
-    title.includes('mini llama') ||
-    dev.includes('mini') ||
-    dev.includes('basicpack')
+    devName === 'Always.UpgradePack.01' &&
+    currencySubType === 'AccountResource:currency_xrayllama'
   ) {
-    return true
+    return 'upgrade'
   }
-
-  return grants.some(
-    (g) =>
-      g.includes('voucher_basicpack') ||
-      g.includes('cardpack_bronze') ||
-      g.includes('mini'),
-  )
-}
-
-/**
- * Upgrade / Super Ranged X-Ray llama.
- * Prefer Always.UpgradePack.01 (50 X-Ray tickets), fallback token pack.
- * Free daily upgrades are excluded from bulk paid buys.
- */
-function findUpgradeLlamaOffer(
-  shop: Array<LlamaManagerShopOffer>,
-): LlamaManagerShopOffer | undefined {
-  const paid = shop.filter((offer) => !offer.isFree && offer.price > 0)
-
-  const byDev01 = paid.find((offer) => offer.devName === 'Always.UpgradePack.01')
-  if (byDev01) {
-    return byDev01
-  }
-
-  const byXray = paid.find((offer) => {
-    const sub = (offer.currencySubType ?? '').toLowerCase()
-    return (
-      sub.includes('currency_xrayllama') &&
-      (offer.price === 50 || offer.regularPrice === 50)
-    )
-  })
-  if (byXray) {
-    return byXray
-  }
-
-  const byDev02 = paid.find((offer) => offer.devName === 'Always.UpgradePack.02')
-  if (byDev02) {
-    return byDev02
-  }
-
-  return paid.find((offer) => {
-    const sub = (offer.currencySubType ?? '').toLowerCase()
-    return (
-      sub.includes('voucher_cardpack_bronze') ||
-      (offer.isXRay && offer.price > 0)
-    )
-  })
-}
-
-function currencyTemplateForOffer(offer: LlamaManagerShopOffer) {
-  const sub = offer.currencySubType ?? ''
-  if (sub.length > 0) {
-    return sub
-  }
-  return 'AccountResource:currency_xrayllama'
-}
-
-function tokensForOffer(
-  currencies: Array<LlamaManagerCurrency>,
-  offer: LlamaManagerShopOffer,
-) {
-  const template = currencyTemplateForOffer(offer).toLowerCase()
-  const key = template
-    .replace('accountresource:', '')
-    .replace('currency:', '')
-
-  const match = currencies.find((c) => {
-    const id = c.templateId.toLowerCase()
-    return (
-      id === template ||
-      id.includes(key) ||
-      (key.includes('xrayllama') && id.includes('xrayllama')) ||
-      (key.includes('voucher_cardpack_bronze') &&
-        id.includes('voucher_cardpack_bronze')) ||
-      (key.includes('voucher_basicpack') && id.includes('voucher_basicpack'))
-    )
-  })
-
-  return match?.quantity ?? 0
-}
-
-function findOfferForKind(
-  shop: Array<LlamaManagerShopOffer>,
-  kind: LlamaManagerBulkKind,
-) {
-  if (kind === 'mini') {
-    return shop.find(isMiniRewardLlamaOffer)
-  }
-  return findUpgradeLlamaOffer(shop)
-}
-
-function noOfferError(kind: LlamaManagerBulkKind) {
-  return kind === 'mini' ? 'no-mini-offer' : 'no-upgrade-offer'
 }
 
 function extractRewards(
@@ -341,12 +251,7 @@ export class LlamaManager {
       const shop: Array<LlamaManagerShopOffer> = []
 
       catalog.data.storefronts.forEach((storefront) => {
-        if (
-          !SHOP_STOREFRONTS.includes(
-            storefront.name as (typeof SHOP_STOREFRONTS)[number],
-          ) &&
-          !storefront.name.toLowerCase().includes('cardpack')
-        ) {
+        if (!storefront.name.toLowerCase().includes('cardpack')) {
           return
         }
 
@@ -381,25 +286,14 @@ export class LlamaManager {
 
           shop.push({
             offerId: entry.offerId,
-            devName: entry.devName ?? '',
             title,
-            storefront: storefront.name,
-            displayAssetPath: entry.displayAssetPath ?? '',
-            dailyLimit,
-            weeklyLimit: entry.weeklyLimit ?? -1,
-            monthlyLimit: entry.monthlyLimit ?? -1,
-            purchasedToday,
             remaining,
-            price: price.finalPrice ?? 0,
-            currencyType: price.currencyType ?? 'GameItem',
-            currencySubType: price.currencySubType ?? '',
-            regularPrice: price.regularPrice ?? price.finalPrice ?? 0,
-            isFree: (price.finalPrice ?? 0) === 0,
+            price: price.finalPrice,
+            currencyType: price.currencyType,
+            currencySubType: price.currencySubType,
+            isFree: price.finalPrice === 0,
             isXRay: storefront.name === 'CardPackStorePreroll',
-            itemGrants: (entry.itemGrants ?? []).map((grant) => ({
-              templateId: grant.templateId,
-              quantity: grant.quantity,
-            })),
+            bulkKind: bulkKindForOffer(entry.devName, price),
             prerollItems: (preroll?.attributes.items ?? []).map(
               (item) => ({
                 itemType: item.itemType,
@@ -459,7 +353,6 @@ export class LlamaManager {
           templateId: item.templateId,
           name: resolveResourceName(item.templateId),
           quantity: item.quantity ?? 1,
-          packSource: item.attributes.pack_source,
           isChoicePack: isChoice || choiceOptions.length > 0,
           choiceOptions,
         })
@@ -558,6 +451,16 @@ export class LlamaManager {
       purchased: 0,
     }
 
+    // Never spend V-Bucks from the Llama Manager
+    if (request.currencyType === 'MtxCurrency') {
+      result.error = 'vbucks'
+      MainWindow.instance.webContents.send(
+        ElectronAPIEventKeys.LlamaManagerActionResult,
+        result,
+      )
+      return
+    }
+
     if (!account) {
       result.error = 'account'
       MainWindow.instance.webContents.send(
@@ -601,7 +504,7 @@ export class LlamaManager {
             accessToken,
             accountId: account.accountId,
             offerId: request.offerId,
-            currency: request.currencyType ?? 'GameItem',
+            currency: request.currencyType,
             currencySubType: request.currencySubType,
             expectedTotalPrice: unitPrice,
             purchaseQuantity: 1,
@@ -654,7 +557,7 @@ export class LlamaManager {
    * Caps by currency balance and daily remaining limit per account.
    */
   static async bulkPurchase(request: LlamaManagerBulkPurchaseRequest) {
-    const kind: LlamaManagerBulkKind = request.kind === 'upgrade' ? 'upgrade' : 'mini'
+    const { kind } = request
     const quantity = Math.max(1, Math.floor(request.quantity || 1))
     const accountIds = [...new Set(request.accountIds)].filter(Boolean)
 
@@ -701,10 +604,12 @@ export class LlamaManager {
             return
           }
 
-          const offer = findOfferForKind(snapshot.shop, kind)
+          const offer = snapshot.shop.find(
+            (shopOffer) => shopOffer.bulkKind === kind,
+          )
 
-          if (!offer) {
-            entry.error = noOfferError(kind)
+          if (!offer || offer.price !== request.price) {
+            entry.error = offer ? 'price' : `no-${kind}-offer`
             summary.accountsFailed += 1
             summary.perAccount.push(entry)
             MainWindow.instance.webContents.send(
@@ -714,9 +619,11 @@ export class LlamaManager {
             return
           }
 
-          const tokens = tokensForOffer(snapshot.currencies, offer)
-          const byTokens =
-            offer.price > 0 ? Math.floor(tokens / offer.price) : quantity
+          const tokens =
+            snapshot.currencies.find(
+              (currency) => currency.templateId === offer.currencySubType,
+            )?.quantity ?? 0
+          const byTokens = Math.floor(tokens / offer.price)
           const byLimit =
             offer.remaining !== null && offer.remaining >= 0
               ? offer.remaining
@@ -762,7 +669,7 @@ export class LlamaManager {
                 accessToken,
                 accountId: account.accountId,
                 offerId: offer.offerId,
-                currency: offer.currencyType ?? 'GameItem',
+                currency: offer.currencyType,
                 currencySubType: offer.currencySubType,
                 expectedTotalPrice: offer.price,
                 purchaseQuantity: 1,
@@ -815,21 +722,14 @@ export class LlamaManager {
     summary.success = summary.totalPurchased > 0
 
     if (!summary.success && !summary.error) {
-      summary.error = 'purchase'
+      summary.error =
+        summary.perAccount.find((entry) => entry.error)?.error ?? 'purchase'
     }
 
     MainWindow.instance.webContents.send(
       ElectronAPIEventKeys.LlamaManagerBulkResult,
       summary,
     )
-  }
-
-  /** @deprecated use bulkPurchase */
-  static async bulkPurchaseMini(request: LlamaManagerBulkPurchaseRequest) {
-    await LlamaManager.bulkPurchase({
-      ...request,
-      kind: request.kind ?? 'mini',
-    })
   }
 
   static async openPacks(request: LlamaManagerOpenRequest) {

@@ -1,20 +1,14 @@
-export type EpicGameEntry = {
-  id: string
-  displayName: string
-  appName: string
-  workingDir: string
-  launchExe: string
-  exchangeLaunch: boolean
-  icon?: string
-}
+import type { AccountData } from './accounts'
+import type { LauncherErrorReason } from './preload'
 
-export type GamesLauncherStartPayload = {
-  account: import('./accounts').AccountData
-  game: EpicGameEntry
+export type EpicGameEntry = {
+  appName: string
+  displayName: string
 }
 
 export type GamesLauncherNotificationPayload = {
-  account: import('./accounts').AccountData
-  game: EpicGameEntry
+  account: AccountData
+  gameName: string
+  reason?: LauncherErrorReason
   status: boolean
 }

@@ -52,12 +52,25 @@
     "level": "Lv {{level}} / {{max}}",
     "stars": "{{count}}★",
     "upgrade": "Upgrade",
-    "slot": "Slot into CB"
+    "slot": "Slot into CB",
+    "favorite": "Favorite (never slotted)"
   },
   "actions": {
     "upgrade-section": "Upgrade section to {{level}}",
-    "slot-section": "Slot whole section",
+    "slot-section": "Slot shown items",
     "empty": "No items in this section."
+  },
+  "confirm": {
+    "cancel": "Cancel",
+    "confirm": "Confirm",
+    "slot": {
+      "title": "Slot into Collection Book?",
+      "description": "{{count}} item(s) will be slotted into the Collection Book. This is permanent: the items are removed from your inventory. Favorited items are skipped. Aerial can't check whether these items are already in your Collection Book."
+    },
+    "upgrade": {
+      "title": "Upgrade items?",
+      "description": "{{count}} item(s) will be upgraded to level {{level}} (or their max level, if lower). This spends Hero, Schematic or Survivor XP and can't be undone."
+    }
   },
   "errors": {
     "auth": "Auth failed",
@@ -69,8 +82,10 @@
     "slotted": "Slotted {{count}} item(s)",
     "error": "Action failed ({{context}})",
     "error_auth": "Authentication failed",
+    "error_fetch": "Could not load the account inventory",
     "error_upgrade": "Upgrade failed (not enough XP or item locked)",
     "error_slot": "Could not slot into Collection Book",
+    "error_slot-empty": "Nothing to slot (favorited items are never slotted)",
     "error_nothing": "Nothing to upgrade at this target level",
     "error_account": "Account not found",
     "error_unknown": "Unknown error"

@@ -135,8 +135,6 @@ export class CollectionBookManager {
           level?: number
           max_level_bonus?: number
           favorite?: boolean
-          // some slotted markers
-          bIsInInventory?: boolean
         }
 
         const level = attributes.level ?? 1
@@ -167,7 +165,6 @@ export class CollectionBookManager {
           starTier,
           rarity: rarities[rarity],
           favorite: attributes.favorite === true,
-          isSlotted: false,
           imageUrl: parsed.imgUrl,
         })
       })
@@ -258,13 +255,12 @@ export class CollectionBookManager {
       )
 
       let upgraded = 0
-      let skipped = snapshot.items.length - candidates.length
+      const skipped = snapshot.items.length - candidates.length
       let failed = 0
 
       for (const item of candidates) {
         const goal = Math.min(targetLevel, item.maxLevel)
         let currentLevel = item.level
-        let itemFailed = false
 
         while (currentLevel < goal) {
           try {
@@ -281,14 +277,9 @@ export class CollectionBookManager {
               await sleep(0.15)
             }
           } catch {
-            itemFailed = true
             failed += 1
             break
           }
-        }
-
-        if (itemFailed) {
-          // continue with next item
         }
       }
 
@@ -348,10 +339,40 @@ export class CollectionBookManager {
         return
       }
 
+      const snapshot = await CollectionBookManager.fetchAccountData(account)
+
+      if (snapshot.error) {
+        result.error = snapshot.error
+        MainWindow.instance.webContents.send(
+          ElectronAPIEventKeys.CollectionBookActionResult,
+          result,
+        )
+        return
+      }
+
+      // Favorited items are never slotted; ids not in the profile are dropped
+      const slottable = new Set(
+        snapshot.items
+          .filter((item) => !item.favorite)
+          .map((item) => item.itemId),
+      )
+      const itemIds = request.itemIds.filter((itemId) =>
+        slottable.has(itemId),
+      )
+
+      if (itemIds.length <= 0) {
+        result.error = 'slot-empty'
+        MainWindow.instance.webContents.send(
+          ElectronAPIEventKeys.CollectionBookActionResult,
+          result,
+        )
+        return
+      }
+
       let slotted = 0
       let failed = 0
 
-      for (const itemId of request.itemIds) {
+      for (const itemId of itemIds) {
         try {
           await setSlotItemIntoCollectionBook({
             accessToken,

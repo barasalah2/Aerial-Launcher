@@ -16,12 +16,17 @@ import {
   BreadcrumbSeparator,
 } from '../../components/ui/breadcrumb'
 import { Button } from '../../components/ui/button'
-import { Card, CardContent, CardDescription, CardHeader } from '../../components/ui/card'
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+} from '../../components/ui/card'
 import { GoToTop } from '../../components/go-to-top'
 
 import { useGetSelectedAccount } from '../../hooks/accounts'
 
-import { cn, parseCustomDisplayName } from '../../lib/utils'
+import { parseCustomDisplayName } from '../../lib/utils'
 import { toast } from '../../lib/notifications'
 
 export const Route = createRoute({
@@ -55,25 +60,34 @@ function GamesLauncherPage() {
   }, [loadGames])
 
   useEffect(() => {
-    const listener = window.electronAPI.onGamesLauncherNotification(async (data) => {
-      setLaunchingId(null)
-      if (data.status) {
+    const listener = window.electronAPI.onGamesLauncherNotification(
+      async (data) => {
+        setLaunchingId(null)
+        if (data.status) {
+          toast(
+            t('notifications.launch-success', {
+              game: data.gameName,
+              account: parseCustomDisplayName(data.account),
+            })
+          )
+          return
+        }
         toast(
-          t('notifications.launch-success', {
-            game: data.game.displayName,
-            account: parseCustomDisplayName(data.account),
-          }),
+          t(
+            data.reason
+              ? `notifications.errors.${data.reason}`
+              : 'notifications.launch-error',
+            {
+              game: data.gameName,
+            }
+          )
         )
-        return
       }
-      toast(
-        t('notifications.launch-error', {
-          game: data.game.displayName,
-        }),
-      )
-    })
+    )
 
-    return () => listener.removeListener()
+    return () => {
+      listener.removeListener()
+    }
   }, [t])
 
   const handleLaunch = (game: EpicGameEntry) => {
@@ -81,8 +95,8 @@ function GamesLauncherPage() {
       toast(t('notifications.no-account'))
       return
     }
-    setLaunchingId(game.id)
-    window.electronAPI.gamesLauncherStart({ account: selected, game })
+    setLaunchingId(game.appName)
+    window.electronAPI.gamesLauncherStart(selected, game.appName)
   }
 
   return (
@@ -98,48 +112,40 @@ function GamesLauncherPage() {
       </Breadcrumb>
 
       <Card className="w-full">
-        <CardHeader className="border-b">
+        <CardHeader
+          className="border-b"
+          id="games-launcher-header"
+        >
           <CardDescription>{t('description')}</CardDescription>
         </CardHeader>
         <CardContent className="p-0">
-          {loading ? (
+          {loading || games.length === 0 ? (
             <div className="p-8 text-center text-sm text-muted-foreground">
-              {t('loading')}
-            </div>
-          ) : games.length === 0 ? (
-            <div className="p-8 text-center text-sm text-muted-foreground">
-              {t('empty')}
+              {loading ? t('loading') : t('empty')}
             </div>
           ) : (
             <ul className="divide-y">
               {games.map((game) => (
                 <li
-                  key={game.id}
+                  key={game.appName}
                   className="flex items-center gap-4 px-4 py-3 sm:px-6"
                 >
                   <div className="flex min-w-0 flex-1 items-center gap-4">
-                    {game.icon ? (
-                      <img
-                        src={game.icon}
-                        alt=""
-                        className="size-10 shrink-0 rounded-md object-contain"
-                      />
-                    ) : (
-                      <div className="flex size-10 shrink-0 items-center justify-center rounded-md bg-muted">
-                        <Gamepad2 className="size-5 text-muted-foreground" />
-                      </div>
-                    )}
-                    <span className="truncate font-medium">{game.displayName}</span>
+                    <div className="flex size-10 shrink-0 items-center justify-center rounded-md bg-muted">
+                      <Gamepad2 className="size-5 text-muted-foreground" />
+                    </div>
+                    <span className="truncate font-medium">
+                      {game.displayName}
+                    </span>
                   </div>
                   <Button
-                    className={cn(
-                      'shrink-0 bg-amber-400 text-black hover:bg-amber-300',
-                      !game.exchangeLaunch && 'opacity-60',
-                    )}
-                    disabled={!selected || !game.exchangeLaunch || launchingId === game.id}
+                    className="shrink-0 bg-amber-400 text-black hover:bg-amber-300"
+                    disabled={!selected || launchingId === game.appName}
                     onClick={() => handleLaunch(game)}
                   >
-                    {launchingId === game.id ? t('launching') : t('launch')}
+                    {launchingId === game.appName
+                      ? t('launching')
+                      : t('launch')}
                   </Button>
                 </li>
               ))}
@@ -148,7 +154,7 @@ function GamesLauncherPage() {
         </CardContent>
       </Card>
 
-      <GoToTop />
+      <GoToTop containerId="games-launcher-header" />
     </>
   )
 }
