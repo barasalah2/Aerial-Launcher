@@ -139,7 +139,8 @@ export function Combobox({
         </PopoverTrigger>
         {currentValues.length > 0 && (
           <button
-            className="absolute p-0.5 right-7 text-muted-foreground hover:text-white"
+            className="absolute p-0.5 right-7 text-muted-foreground hover:text-white disabled:pointer-events-none disabled:opacity-50"
+            disabled={disabled}
             onClick={clearValues}
           >
             <X className="size-4" />
