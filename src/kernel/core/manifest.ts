@@ -2,9 +2,21 @@ import { readdirSync, readFileSync } from 'node:fs'
 import path from 'node:path'
 
 import { SettingsManager } from '../startup/settings'
+import { getEglv2Installation } from './eglv2'
 
 export class Manifest {
   static getData() {
+    const installation = getEglv2Installation('Fortnite')
+
+    if (installation?.version) {
+      return {
+        AppVersionString: installation.version,
+        DisplayName: 'fortnite',
+        LaunchCommand: installation.launchCommand?.trim() ?? '',
+        UserAgent: `Fortnite/${installation.version}`,
+      }
+    }
+
     try {
       const manifestsDirectory =
         'C:\\ProgramData\\Epic\\EpicGamesLauncher\\Data\\Manifests'

@@ -21,6 +21,7 @@ import {
 import { launcherAppClient2 } from '../../config/fortnite/clients'
 
 import { CustomProcess } from '../core/custom-process'
+import { getEglv2Installation } from '../core/eglv2'
 import { MainWindow } from './windows/main'
 import { DataDirectory } from './data-directory'
 import { SystemTray } from './system-tray'
@@ -293,6 +294,21 @@ export class AppLanguage {
 }
 
 function detectGameData({ namespaceId }: GameContext): DetectGameResult {
+  const installation = getEglv2Installation(
+    defaultGamePath[namespaceId].name,
+  )
+
+  if (installation) {
+    return {
+      appVersion: installation.version ?? null,
+      name: defaultGamePath[namespaceId].name,
+      path: path.join(
+        installation.dir,
+        defaultGamePath[namespaceId].extra,
+      ),
+    }
+  }
+
   try {
     const file = JSON.parse(
       readFileSync(
