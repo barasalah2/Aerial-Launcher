@@ -101,6 +101,18 @@ function giftsPath() {
   return path.join(DataDirectory.rootPath, 'item-shop-gifts.json')
 }
 
+/**
+ * The Battle Royale shop rotates daily at 00:00 UTC. The catalog's own
+ * expiration is the next refresh of any storefront, not the shop rotation
+ */
+function nextShopRotation() {
+  const now = new Date()
+
+  return new Date(
+    Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate() + 1)
+  ).toISOString()
+}
+
 function isNewShopAvailable(expiration: string | null) {
   if (!expiration) {
     return false
@@ -369,8 +381,7 @@ export class ItemShop {
       }
 
       const catalog = await getCatalog({ accessToken })
-      payload.expiration = catalog.data.expiration ?? null
-      payload.newShopAvailable = isNewShopAvailable(payload.expiration)
+      payload.expiration = nextShopRotation()
 
       const epicByOfferId = new Map<string, ItemShopOffer['grants']>()
       const epicPriceByOfferId = new Map<
