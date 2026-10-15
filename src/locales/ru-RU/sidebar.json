@@ -1,4 +1,7 @@
 {
+  "games-launcher": {
+    "title": "Games Launcher"
+  },
   "stw-operations": {
     "title": "ПВЕ Операции",
     "options": {
@@ -11,6 +14,9 @@
       "xp-boosts": "Усилители Опыта",
       "auto-pin-urns": "Авто Закреп Урн",
       "auto-llamas": "Автолама",
+      "llama-manager": "Менеджер лам",
+      "item-shop": "Магазин",
+      "collection-book": "Книга коллекции",
       "unlock": "Скип щитов"
     },
     "auto-kick-status": {

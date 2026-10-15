@@ -16,6 +16,7 @@ export const customizableMenuSettingsRelations: Record<
   keyof Pick<
     CustomizableMenuSettings,
     | 'currentAlerts'
+    | 'gamesLauncher'
     | 'stwOperations'
     | 'accountManagement'
     | 'advancedMode'
@@ -25,6 +26,7 @@ export const customizableMenuSettingsRelations: Record<
     keyof Omit<
       CustomizableMenuSettings,
       | 'currentAlerts'
+      | 'gamesLauncher'
       | 'stwOperations'
       | 'accountManagement'
       | 'advancedMode'
@@ -33,6 +35,7 @@ export const customizableMenuSettingsRelations: Record<
   >
 > = {
   currentAlerts: [],
+  gamesLauncher: [],
   stwOperations: [
     'autoKick',
     'taxiService',
@@ -43,6 +46,9 @@ export const customizableMenuSettingsRelations: Record<
     'xpBoosts',
     'autoPinUrns',
     'autoLlamas',
+    'llamaManager',
+    'itemShop',
+    'collectionBook',
     'unlock',
   ],
   accountManagement: [

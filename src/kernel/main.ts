@@ -17,6 +17,21 @@ import type { CustomizableMenuSettings, Settings } from '../types/settings'
 import type { TagRecord } from '../types/tags'
 import type { TaxiServiceServiceActionConfig } from '../types/taxi-service'
 import type {
+  CollectionBookSlotRequest,
+  CollectionBookUpgradeRequest,
+} from '../types/collection-book'
+import type {
+  ItemShopCreatorCodeRequest,
+  ItemShopGiftRequest,
+  ItemShopPurchaseRequest,
+} from '../types/item-shop'
+import type {
+  LlamaManagerBulkPurchaseRequest,
+  LlamaManagerOpenChoiceRequest,
+  LlamaManagerOpenRequest,
+  LlamaManagerPurchaseRequest,
+} from '../types/llama-manager'
+import type {
   XPBoostsConsumePersonalData,
   XPBoostsConsumeTeammateData,
   XPBoostsSearchUserConfig,
@@ -40,6 +55,14 @@ import { ClaimRewards } from './core/claim-rewards'
 import { DevicesAuthManager } from './core/devices-auth'
 import { EULATracking } from './core/eula-tracking'
 import { FortniteLauncher } from './core/launcher'
+import { GamesLauncher } from './core/games-launcher'
+import { CollectionBookManager } from './core/collection-book'
+import { ItemShop } from './core/item-shop'
+import {
+  registerItemShopProtocol,
+  registerItemShopScheme,
+} from './core/item-shop-protocol'
+import { LlamaManager } from './core/llama-manager'
 import {
   MCPClientQuestLogin,
   MCPDailyQuests,
@@ -96,7 +119,11 @@ if (require('electron-squirrel-startup')) {
 
 const gotTheLock = app.requestSingleInstanceLock()
 
-;(() => {
+if (gotTheLock) {
+  registerItemShopScheme()
+}
+
+void (() => {
   if (!gotTheLock) {
     return app.quit()
   }
@@ -122,6 +149,19 @@ const gotTheLock = app.requestSingleInstanceLock()
     if (manifest) {
       mainWindow.webContents.setUserAgent(manifest.UserAgent)
     }
+
+    const browserUserAgent =
+      'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36'
+
+    mainWindow.webContents.session.webRequest.onBeforeSendHeaders(
+      { urls: ['https://fortnite-api.com/*'] },
+      (details, callback) => {
+        details.requestHeaders['User-Agent'] = browserUserAgent
+        callback({ requestHeaders: details.requestHeaders })
+      },
+    )
+
+    MainWindow.setInstance(mainWindow)
 
     // and load the index.html of the app.
     if (MAIN_WINDOW_VITE_DEV_SERVER_URL) {
@@ -165,7 +205,26 @@ const gotTheLock = app.requestSingleInstanceLock()
   // initialization and is ready to create browser windows.
   // Some APIs can only be used after this event occurs.
   app.on('ready', async () => {
-    DataDirectory.createDataResources().catch(() => {})
+    try {
+      await DataDirectory.createDataResources()
+      await AccountsManager.loadFromDisk()
+    } catch {
+      //
+    }
+
+    ipcMain.on(ElectronAPIEventKeys.RequestAccounts, async () => {
+      await AccountsManager.load()
+    })
+
+    ipcMain.on(ElectronAPIEventKeys.HomeWorldInfoRequest, async () => {
+      await WorldInfoManager.requestForHome()
+    })
+
+    ipcMain.on(ElectronAPIEventKeys.WorldInfoRequestData, async () => {
+      await WorldInfoManager.requestForAdvanceSection()
+    })
+
+    registerItemShopProtocol()
 
     MainWindow.setInstance(await createWindow())
 
@@ -194,10 +253,6 @@ const gotTheLock = app.requestSingleInstanceLock()
         await AppLanguage.update(language)
       },
     )
-
-    ipcMain.on(ElectronAPIEventKeys.RequestAccounts, async () => {
-      await AccountsManager.load()
-    })
 
     ipcMain.on(ElectronAPIEventKeys.RequestSettings, async () => {
       await SettingsManager.load()
@@ -376,6 +431,17 @@ const gotTheLock = app.requestSingleInstanceLock()
       },
     )
 
+    ipcMain.handle(ElectronAPIEventKeys.GamesLauncherScan, async () => {
+      return GamesLauncher.scan()
+    })
+
+    ipcMain.on(
+      ElectronAPIEventKeys.GamesLauncherStart,
+      async (_, payload) => {
+        await GamesLauncher.launch(payload.account, payload.game)
+      },
+    )
+
     /**
      * STW Operations
      */
@@ -514,6 +580,20 @@ const gotTheLock = app.requestSingleInstanceLock()
     )
 
     ipcMain.on(
+      ElectronAPIEventKeys.PartyLookupPlayerAction,
+      async (_, accounts: AccountDataList, displayName: string) => {
+        await Party.lookupPlayer(accounts, displayName)
+      },
+    )
+
+    ipcMain.on(
+      ElectronAPIEventKeys.PartySendFriendRequestAction,
+      async (_, accounts: AccountDataList, friendId: string) => {
+        await Party.sendFriendRequests(accounts, friendId)
+      },
+    )
+
+    ipcMain.on(
       ElectronAPIEventKeys.PartyRemoveFriendAction,
       async (
         _,
@@ -536,14 +616,6 @@ const gotTheLock = app.requestSingleInstanceLock()
         await AlertsDone.fetchPlayerData(config)
       },
     )
-
-    ipcMain.on(ElectronAPIEventKeys.HomeWorldInfoRequest, async () => {
-      await WorldInfoManager.requestForHome()
-    })
-
-    ipcMain.on(ElectronAPIEventKeys.WorldInfoRequestData, async () => {
-      await WorldInfoManager.requestForAdvanceSection()
-    })
 
     ipcMain.on(
       ElectronAPIEventKeys.WorldInfoSaveFile,
@@ -767,6 +839,117 @@ const gotTheLock = app.requestSingleInstanceLock()
     ipcMain.on(ElectronAPIEventKeys.AutoLlamasAccountCheck, async () => {
       await AutoLlamas.check()
     })
+
+    /**
+     * Llama Manager
+     */
+
+    ipcMain.on(
+      ElectronAPIEventKeys.LlamaManagerRequestData,
+      async (_, accounts: Array<AccountData>) => {
+        await LlamaManager.requestBulk(accounts)
+      },
+    )
+
+    ipcMain.on(
+      ElectronAPIEventKeys.LlamaManagerPurchase,
+      async (_, data: LlamaManagerPurchaseRequest) => {
+        await LlamaManager.purchase(data)
+      },
+    )
+
+    ipcMain.on(
+      ElectronAPIEventKeys.LlamaManagerBulkPurchase,
+      async (_, data: LlamaManagerBulkPurchaseRequest) => {
+        await LlamaManager.bulkPurchase(data)
+      },
+    )
+
+    ipcMain.on(
+      ElectronAPIEventKeys.LlamaManagerOpenPacks,
+      async (_, data: LlamaManagerOpenRequest) => {
+        await LlamaManager.openPacks(data)
+      },
+    )
+
+    ipcMain.on(
+      ElectronAPIEventKeys.LlamaManagerOpenChoice,
+      async (_, data: LlamaManagerOpenChoiceRequest) => {
+        await LlamaManager.openChoicePack(data)
+      },
+    )
+
+    /**
+     * Item Shop
+     */
+
+    ipcMain.on(ElectronAPIEventKeys.ItemShopLoadCache, async () => {
+      await ItemShop.loadCachedCatalog()
+    })
+
+    ipcMain.on(ElectronAPIEventKeys.ItemShopGiftHistoryRequest, async () => {
+      await ItemShop.loadGiftHistory()
+    })
+
+    ipcMain.on(
+      ElectronAPIEventKeys.ItemShopCatalogRequest,
+      async (_, account: AccountData) => {
+        await ItemShop.requestCatalog(account)
+      },
+    )
+
+    ipcMain.on(
+      ElectronAPIEventKeys.ItemShopAccountsRequest,
+      async (_, accounts: Array<AccountData>) => {
+        await ItemShop.requestAccounts(accounts)
+      },
+    )
+
+    ipcMain.on(
+      ElectronAPIEventKeys.ItemShopCreatorCode,
+      async (_, data: ItemShopCreatorCodeRequest) => {
+        await ItemShop.applyCreatorCode(data)
+      },
+    )
+
+    ipcMain.on(
+      ElectronAPIEventKeys.ItemShopPurchase,
+      async (_, data: ItemShopPurchaseRequest) => {
+        await ItemShop.purchase(data)
+      },
+    )
+
+    ipcMain.on(
+      ElectronAPIEventKeys.ItemShopGift,
+      async (_, data: ItemShopGiftRequest) => {
+        await ItemShop.gift(data)
+      },
+    )
+
+    /**
+     * Collection Book Manager
+     */
+
+    ipcMain.on(
+      ElectronAPIEventKeys.CollectionBookRequestData,
+      async (_, accounts: Array<AccountData>) => {
+        await CollectionBookManager.requestBulk(accounts)
+      },
+    )
+
+    ipcMain.on(
+      ElectronAPIEventKeys.CollectionBookUpgrade,
+      async (_, data: CollectionBookUpgradeRequest) => {
+        await CollectionBookManager.upgrade(data)
+      },
+    )
+
+    ipcMain.on(
+      ElectronAPIEventKeys.CollectionBookSlot,
+      async (_, data: CollectionBookSlotRequest) => {
+        await CollectionBookManager.slotItems(data)
+      },
+    )
 
     /**
      * V-Bucks Information

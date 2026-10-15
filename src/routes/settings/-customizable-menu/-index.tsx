@@ -34,6 +34,7 @@ export function CustomizableMenu() {
         )}
       >
         <CurrentAlertsSection />
+        <GamesLauncherSection />
         <STWOperationsSection />
         <AccountManagementSection />
         <AdvancedModeSection />
@@ -63,6 +64,32 @@ function CurrentAlertsSection() {
           id="current-alerts"
           checked={getMenuOptionVisibility('currentAlerts')}
           onCheckedChange={updateMenuOption('currentAlerts')}
+        />
+      </div>
+    </div>
+  )
+}
+
+function GamesLauncherSection() {
+  const { t } = useTranslation(['sidebar'])
+
+  const { getMenuOptionVisibility } =
+    useCustomizableMenuSettingsVisibility()
+  const { updateMenuOption } = useCustomizableMenuSettingsActions()
+
+  return (
+    <div className="category">
+      <div className="item main">
+        <Label
+          className="title text-lg"
+          htmlFor="games-launcher"
+        >
+          {t('games-launcher.title')}
+        </Label>
+        <Switch
+          id="games-launcher"
+          checked={getMenuOptionVisibility('gamesLauncher')}
+          onCheckedChange={updateMenuOption('gamesLauncher')}
         />
       </div>
     </div>
@@ -207,6 +234,45 @@ function STWOperationsSection() {
             id="auto-llamas"
             checked={getMenuOptionVisibility('autoLlamas')}
             onCheckedChange={updateMenuOption('autoLlamas')}
+          />
+        </div>
+        <div className="item">
+          <Label
+            className="title"
+            htmlFor="llama-manager"
+          >
+            {t('stw-operations.options.llama-manager')}
+          </Label>
+          <Switch
+            id="llama-manager"
+            checked={getMenuOptionVisibility('llamaManager')}
+            onCheckedChange={updateMenuOption('llamaManager')}
+          />
+        </div>
+        <div className="item">
+          <Label
+            className="title"
+            htmlFor="item-shop"
+          >
+            {t('stw-operations.options.item-shop')}
+          </Label>
+          <Switch
+            id="item-shop"
+            checked={getMenuOptionVisibility('itemShop')}
+            onCheckedChange={updateMenuOption('itemShop')}
+          />
+        </div>
+        <div className="item">
+          <Label
+            className="title"
+            htmlFor="collection-book"
+          >
+            {t('stw-operations.options.collection-book')}
+          </Label>
+          <Switch
+            id="collection-book"
+            checked={getMenuOptionVisibility('collectionBook')}
+            onCheckedChange={updateMenuOption('collectionBook')}
           />
         </div>
         <div className="item">

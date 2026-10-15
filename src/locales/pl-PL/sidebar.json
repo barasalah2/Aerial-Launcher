@@ -1,4 +1,7 @@
 {
+  "games-launcher": {
+    "title": "Games Launcher"
+  },
   "stw-operations": {
     "title": "Operacje w RŚ",
     "options": {
@@ -11,6 +14,9 @@
       "xp-boosts": "Wzmocnienia PD",
       "auto-pin-urns": "Aut-przypinanie Urn",
       "auto-llamas": "Auto-llamy",
+      "llama-manager": "Menedżer lam",
+      "item-shop": "Sklep",
+      "collection-book": "Księga kolekcji",
       "unlock": "Odblokuj nagrody Burzowej Tarczy"
     },
     "auto-kick-status": {

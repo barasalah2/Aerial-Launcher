@@ -12,6 +12,7 @@
 
 import { Route as rootRoute } from './routes/__root'
 import { Route as SettingsRouteImport } from './routes/settings/route'
+import { Route as GamesLauncherRouteImport } from './routes/games-launcher/route'
 import { Route as IndexImport } from './routes/index'
 import { Route as StwOperationsXpboostsRouteImport } from './routes/stw-operations/xpboosts/route'
 import { Route as StwOperationsUrnsRouteImport } from './routes/stw-operations/urns/route'
@@ -19,8 +20,11 @@ import { Route as StwOperationsUnlockRouteImport } from './routes/stw-operations
 import { Route as StwOperationsTaxiServiceRouteImport } from './routes/stw-operations/taxi-service/route'
 import { Route as StwOperationsSaveQuestsRouteImport } from './routes/stw-operations/save-quests/route'
 import { Route as StwOperationsPartyRouteImport } from './routes/stw-operations/party/route'
+import { Route as StwOperationsLlamaManagerRouteImport } from './routes/stw-operations/llama-manager/route'
+import { Route as StwOperationsItemShopRouteImport } from './routes/stw-operations/item-shop/route'
 import { Route as StwOperationsHomebaseNameRouteImport } from './routes/stw-operations/homebase-name/route'
 import { Route as StwOperationsDailyQuestsRouteImport } from './routes/stw-operations/daily-quests/route'
+import { Route as StwOperationsCollectionBookRouteImport } from './routes/stw-operations/collection-book/route'
 import { Route as StwOperationsAutomationRouteImport } from './routes/stw-operations/automation/route'
 import { Route as StwOperationsAutoLlamasRouteImport } from './routes/stw-operations/auto-llamas/route'
 import { Route as InformationCreditsRouteImport } from './routes/information/credits/route'
@@ -38,6 +42,11 @@ import { Route as AccountsAddTypeImport } from './routes/accounts/add/$type'
 
 const SettingsRouteRoute = SettingsRouteImport.update({
   path: '/settings',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const GamesLauncherRouteRoute = GamesLauncherRouteImport.update({
+  path: '/games-launcher',
   getParentRoute: () => rootRoute,
 } as any)
 
@@ -80,6 +89,19 @@ const StwOperationsPartyRouteRoute = StwOperationsPartyRouteImport.update({
   getParentRoute: () => rootRoute,
 } as any)
 
+const StwOperationsLlamaManagerRouteRoute =
+  StwOperationsLlamaManagerRouteImport.update({
+    path: '/stw-operations/llama-manager',
+    getParentRoute: () => rootRoute,
+  } as any)
+
+const StwOperationsItemShopRouteRoute = StwOperationsItemShopRouteImport.update(
+  {
+    path: '/stw-operations/item-shop',
+    getParentRoute: () => rootRoute,
+  } as any,
+)
+
 const StwOperationsHomebaseNameRouteRoute =
   StwOperationsHomebaseNameRouteImport.update({
     path: '/stw-operations/homebase-name',
@@ -89,6 +111,12 @@ const StwOperationsHomebaseNameRouteRoute =
 const StwOperationsDailyQuestsRouteRoute =
   StwOperationsDailyQuestsRouteImport.update({
     path: '/stw-operations/daily-quests',
+    getParentRoute: () => rootRoute,
+  } as any)
+
+const StwOperationsCollectionBookRouteRoute =
+  StwOperationsCollectionBookRouteImport.update({
+    path: '/stw-operations/collection-book',
     getParentRoute: () => rootRoute,
   } as any)
 
@@ -171,6 +199,10 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexImport
       parentRoute: typeof rootRoute
     }
+    '/games-launcher': {
+      preLoaderRoute: typeof GamesLauncherRouteImport
+      parentRoute: typeof rootRoute
+    }
     '/settings': {
       preLoaderRoute: typeof SettingsRouteImport
       parentRoute: typeof rootRoute
@@ -219,12 +251,24 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof StwOperationsAutomationRouteImport
       parentRoute: typeof rootRoute
     }
+    '/stw-operations/collection-book': {
+      preLoaderRoute: typeof StwOperationsCollectionBookRouteImport
+      parentRoute: typeof rootRoute
+    }
     '/stw-operations/daily-quests': {
       preLoaderRoute: typeof StwOperationsDailyQuestsRouteImport
       parentRoute: typeof rootRoute
     }
     '/stw-operations/homebase-name': {
       preLoaderRoute: typeof StwOperationsHomebaseNameRouteImport
+      parentRoute: typeof rootRoute
+    }
+    '/stw-operations/item-shop': {
+      preLoaderRoute: typeof StwOperationsItemShopRouteImport
+      parentRoute: typeof rootRoute
+    }
+    '/stw-operations/llama-manager': {
+      preLoaderRoute: typeof StwOperationsLlamaManagerRouteImport
       parentRoute: typeof rootRoute
     }
     '/stw-operations/party': {
@@ -262,6 +306,7 @@ declare module '@tanstack/react-router' {
 
 export const routeTree = rootRoute.addChildren([
   IndexRoute,
+  GamesLauncherRouteRoute,
   SettingsRouteRoute,
   AccountManagementDevicesAuthRouteRoute,
   AccountManagementEpicGamesSettingsRouteRoute,
@@ -274,8 +319,11 @@ export const routeTree = rootRoute.addChildren([
   InformationCreditsRouteRoute,
   StwOperationsAutoLlamasRouteRoute,
   StwOperationsAutomationRouteRoute,
+  StwOperationsCollectionBookRouteRoute,
   StwOperationsDailyQuestsRouteRoute,
   StwOperationsHomebaseNameRouteRoute,
+  StwOperationsItemShopRouteRoute,
+  StwOperationsLlamaManagerRouteRoute,
   StwOperationsPartyRouteRoute,
   StwOperationsSaveQuestsRouteRoute,
   StwOperationsTaxiServiceRouteRoute,

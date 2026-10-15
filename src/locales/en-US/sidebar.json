@@ -1,4 +1,7 @@
 {
+  "games-launcher": {
+    "title": "Games Launcher"
+  },
   "stw-operations": {
     "title": "STW Operations",
     "options": {
@@ -11,6 +14,9 @@
       "xp-boosts": "XP Boosts",
       "auto-pin-urns": "Auto-pin Urns",
       "auto-llamas": "Auto-llamas",
+      "llama-manager": "Llama Manager",
+      "item-shop": "Item Shop",
+      "collection-book": "Collection Book",
       "unlock": "Unlock SSD Rewards"
     },
     "auto-kick-status": {

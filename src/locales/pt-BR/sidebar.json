@@ -1,4 +1,7 @@
 {
+  "games-launcher": {
+    "title": "Games Launcher"
+  },
   "stw-operations": {
     "title": "Operações STW",
     "options": {
@@ -11,6 +14,9 @@
       "xp-boosts": "Impulsos de XP",
       "auto-pin-urns": "Fixar Urnas Automaticamente",
       "auto-llamas": "Lhamas Automáticas",
+      "llama-manager": "Gerenciador de Lhamas",
+      "item-shop": "Loja",
+      "collection-book": "Livro de coleção",
       "unlock": "Desbloquear Recompensas dos Escudos"
     },
     "auto-kick-status": {

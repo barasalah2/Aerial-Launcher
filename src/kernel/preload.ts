@@ -8,12 +8,16 @@ import * as alertsActions from './preload-actions/alerts'
 import * as authenticationActions from './preload-actions/authentication'
 import * as autoLlamasActions from './preload-actions/auto-llamas'
 import * as autoPinUrnsActions from './preload-actions/auto-pin-urns'
+import * as collectionBookActions from './preload-actions/collection-book'
 import * as automationsActions from './preload-actions/automation'
 import * as customizableMenuActions from './preload-actions/customizable-menu'
 import * as devicesAuthActions from './preload-actions/devices-auth'
 import * as eventActions from './preload-actions/events'
+import * as gamesLauncherActions from './preload-actions/games-launcher'
 import * as generalActions from './preload-actions/general'
 import * as launcherActions from './preload-actions/launcher'
+import * as itemShopActions from './preload-actions/item-shop'
+import * as llamaManagerActions from './preload-actions/llama-manager'
 import * as matchmakingActions from './preload-actions/matchmaking'
 import * as mcpActions from './preload-actions/mcp'
 import * as partyActions from './preload-actions/party'
@@ -31,13 +35,17 @@ export const availableElectronAPIs = {
   ...alertsActions,
   ...authenticationActions,
   ...autoLlamasActions,
+  ...collectionBookActions,
   ...automationsActions,
   ...customizableMenuActions,
   ...autoPinUrnsActions,
   ...devicesAuthActions,
   ...eventActions,
+  ...gamesLauncherActions,
   ...generalActions,
   ...launcherActions,
+  ...itemShopActions,
+  ...llamaManagerActions,
   ...partyActions,
   ...redeemCodesActions,
   ...matchmakingActions,

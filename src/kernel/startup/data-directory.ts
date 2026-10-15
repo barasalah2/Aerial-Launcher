@@ -47,6 +47,10 @@ export class DataDirectory {
     'aerial-launcher-data',
   )
 
+  static get rootPath() {
+    return DataDirectory.dataDirectoryPath
+  }
+
   private static worldInfoDirectoryPath = path.join(
     DataDirectory.dataDirectoryPath,
     'world-info',
@@ -79,6 +83,7 @@ export class DataDirectory {
     customProcess: 'FortniteClient-Win64-Shipping.exe',
     missionInterval: `${defaultMissionInterval}`,
     path: 'C:\\Program Files\\Epic Games\\Fortnite\\FortniteGame\\Binaries\\Win64',
+    epicGamesDir: 'C:\\Program Files\\Epic Games',
     systemTray: false,
     userAgent: 'Fortnite/++Fortnite+Release-34.40-CL-41753727-Windows',
   }

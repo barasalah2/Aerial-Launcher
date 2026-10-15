@@ -193,6 +193,79 @@ export function purchaseCatalogEntry({
   )
 }
 
+export function giftCatalogEntry({
+  accessToken,
+  accountId,
+  offerId,
+  receiverAccountIds,
+  expectedTotalPrice,
+  personalMessage = '',
+  giftWrapTemplateId = 'GiftBox:gb_default',
+  currency = 'MtxCurrency',
+  currencySubType = '',
+  purchaseQuantity = 1,
+}: {
+  accessToken: string
+  accountId: string
+  offerId: string
+  receiverAccountIds: Array<string>
+  expectedTotalPrice: number
+  personalMessage?: string
+  giftWrapTemplateId?: string
+  currency?: string
+  currencySubType?: string
+  purchaseQuantity?: number
+}) {
+  return baseGameService.post<MCPPurchaseCatalogEntryResponse>(
+    `/profile/${accountId}/client/GiftCatalogEntry`,
+    {
+      offerId,
+      currency,
+      currencySubType,
+      expectedTotalPrice,
+      purchaseQuantity,
+      receiverAccountIds,
+      giftWrapTemplateId,
+      personalMessage,
+    },
+    {
+      headers: {
+        Authorization: `bearer ${accessToken}`,
+      },
+      params: {
+        profileId: 'common_core',
+        rvn: -1,
+      },
+    }
+  )
+}
+
+export function setAffiliateName({
+  accessToken,
+  accountId,
+  affiliateName,
+}: {
+  accessToken: string
+  accountId: string
+  affiliateName: string
+}) {
+  return baseGameService.post<MCPQueryProfileMainProfile>(
+    `/profile/${accountId}/client/SetAffiliateName`,
+    {
+      affiliateName,
+    },
+    {
+      headers: {
+        Authorization: `bearer ${accessToken}`,
+      },
+      params: {
+        profileId: 'common_core',
+        rvn: -1,
+      },
+    }
+  )
+}
+
 export function setActivateConsumable({
   accessToken,
   accountId,
@@ -380,6 +453,87 @@ export function setOpenCardPackBatch({
     {
       cardPackItemIds,
     } as MCPOpenCardPackBatchPayload,
+    {
+      headers: {
+        Authorization: `bearer ${accessToken}`,
+      },
+      params: {
+        profileId: 'campaign',
+        rvn: -1,
+      },
+    }
+  )
+}
+
+export function setOpenCardPack({
+  accessToken,
+  accountId,
+  cardPackItemId,
+  selectionIdx = 0,
+}: {
+  accessToken: string
+  accountId: string
+  cardPackItemId: string
+  selectionIdx?: number
+}) {
+  return baseGameService.post<MCPOpenCardPackBatchResponse>(
+    `/profile/${accountId}/client/OpenCardPack`,
+    {
+      cardPackItemId,
+      selectionIdx,
+    },
+    {
+      headers: {
+        Authorization: `bearer ${accessToken}`,
+      },
+      params: {
+        profileId: 'campaign',
+        rvn: -1,
+      },
+    }
+  )
+}
+
+export function setUpgradeItem({
+  accessToken,
+  accountId,
+  targetItemId,
+}: {
+  accessToken: string
+  accountId: string
+  targetItemId: string
+}) {
+  return baseGameService.post<MCPQueryProfile>(
+    `/profile/${accountId}/client/UpgradeItem`,
+    {
+      targetItemId,
+    },
+    {
+      headers: {
+        Authorization: `bearer ${accessToken}`,
+      },
+      params: {
+        profileId: 'campaign',
+        rvn: -1,
+      },
+    }
+  )
+}
+
+export function setSlotItemIntoCollectionBook({
+  accessToken,
+  accountId,
+  itemId,
+}: {
+  accessToken: string
+  accountId: string
+  itemId: string
+}) {
+  return baseGameService.post<MCPQueryProfile>(
+    `/profile/${accountId}/client/SlotItemIntoCollectionBook`,
+    {
+      itemId,
+    },
     {
       headers: {
         Authorization: `bearer ${accessToken}`,

@@ -1,4 +1,7 @@
 {
+  "games-launcher": {
+    "title": "Games Launcher"
+  },
   "stw-operations": {
     "title": "Operazioni STW",
     "options": {
@@ -11,6 +14,9 @@
       "xp-boosts": "Incrementi PE",
       "auto-pin-urns": "Auto-fissa Rovine",
       "auto-llamas": "Auto-lama",
+      "llama-manager": "Gestore Llama",
+      "item-shop": "Item Shop",
+      "collection-book": "Libro collezione",
       "unlock": "Sblocca Ricompense SSD"
     },
     "auto-kick-status": {
