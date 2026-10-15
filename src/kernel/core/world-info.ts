@@ -23,7 +23,6 @@ import { defaultWorldInfo } from '../../config/constants/fortnite/world-info'
 import { ElectronAPIEventKeys } from '../../config/constants/main-process'
 
 import { MainWindow } from '../startup/windows/main'
-import { AccountsManager } from '../startup/accounts'
 import { DataDirectory } from '../startup/data-directory'
 import { Authentication } from './authentication'
 
@@ -309,7 +308,8 @@ export class WorldInfoManager {
    */
   private static async request(): Promise<WorldInfoResponse> {
     try {
-      const account = AccountsManager.getAccounts().first()
+      // Read from disk: on startup this runs before AccountsManager.load()
+      const [account] = (await DataDirectory.getAccountsFile()).accounts
       const accessToken = account
         ? await Authentication.verifyAccessToken(account)
         : null
