@@ -1,8 +1,8 @@
 > **NOTE:** Currently in development.
 
-![GitHub Downloads (all assets, all releases)](https://img.shields.io/github/downloads/Ciensprog/Aerial-Launcher/total?label=All%20Release%20Downloads) ![GitHub Downloads (all assets, latest release)](https://img.shields.io/github/downloads/Ciensprog/Aerial-Launcher/latest/total?label=Latest%20Release%20Downloads)
+![GitHub Downloads (all assets, all releases)](https://img.shields.io/github/downloads/barasalah2/Aerial-Launcher/total?label=All%20Release%20Downloads) ![GitHub Downloads (all assets, latest release)](https://img.shields.io/github/downloads/barasalah2/Aerial-Launcher/latest/total?label=Latest%20Release%20Downloads)
 
-![GitHub License](https://img.shields.io/github/license/Ciensprog/Aerial-Launcher?label=License) ![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/Ciensprog/Aerial-Launcher/release.yml?label=Build) ![GitHub Repo Size](https://img.shields.io/github/repo-size/Ciensprog/Aerial-Launcher?label=Repo%20Size) ![GitHub package.json Version](https://img.shields.io/github/package-json/v/Ciensprog/Aerial-Launcher?label=Current%20Version) ![GitHub last commit](https://img.shields.io/github/last-commit/Ciensprog/Aerial-Launcher?label=Last%20Commit)
+![GitHub License](https://img.shields.io/github/license/barasalah2/Aerial-Launcher?label=License) ![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/barasalah2/Aerial-Launcher/release.yml?label=Build) ![GitHub Repo Size](https://img.shields.io/github/repo-size/barasalah2/Aerial-Launcher?label=Repo%20Size) ![GitHub package.json Version](https://img.shields.io/github/package-json/v/barasalah2/Aerial-Launcher?label=Current%20Version) ![GitHub last commit](https://img.shields.io/github/last-commit/barasalah2/Aerial-Launcher?label=Last%20Commit)
 
 > [!IMPORTANT]
 >
@@ -13,7 +13,7 @@
 
 This is [barasalah2/Aerial-Launcher](https://github.com/barasalah2/Aerial-Launcher), a fork of [Ciensprog/Aerial-Launcher](https://github.com/Ciensprog/Aerial-Launcher) 1.12.3. It fixes what broke with the Epic Games Launcher v2 update (October 2026) and adds features from [Mikro900ytpl's fork](https://github.com/Mikro900ytpl/Aerial-Launcher), which were reviewed and hardened before merging.
 
-**Download:** `Aerial.Launcher-1.13.0.Setup.exe` from this fork's [releases](https://github.com/barasalah2/Aerial-Launcher/releases). It uses the same data folder as the original (`%APPDATA%\aerial-launcher-data`), so your accounts and settings carry over.
+**Download:** `Aerial.Launcher-1.13.1.Setup.exe` from this fork's [releases](https://github.com/barasalah2/Aerial-Launcher/releases). It uses the same data folder as the original (`%APPDATA%\aerial-launcher-data`), so your accounts and settings carry over.
 
 > [!IMPORTANT]
 > Keep **Epic Games Launcher running** when you launch Fortnite from Aerial. With EGL v2 the game needs it, and Aerial tells you if it isn't running.
@@ -38,11 +38,11 @@ This is [barasalah2/Aerial-Launcher](https://github.com/barasalah2/Aerial-Launch
 ### Privacy
 
 - Aerial talks to Epic's own servers (`*.epicgames.com`).
-- The only other service it contacts is [fortnite-api.com](https://fortnite-api.com), for the public Item Shop list and item icons. No account data, tokens or names are sent there.
+- It also contacts [fortnite-api.com](https://fortnite-api.com), for the public Item Shop list and item icons, and this fork on GitHub, for update checks and images. No account data, tokens or names are sent to either.
 - Everything Aerial saves stays in `%APPDATA%\aerial-launcher-data`.
 
 > [!NOTE]
-> The in-app "new version" notice checks the original repository, not this fork.
+> The in-app "new version" notice checks this fork's releases.
 
 # Aerial Launcher
 
@@ -88,7 +88,7 @@ But what does it mean that this project is Open-Source? It is very simple, to en
 
 ## Installation
 
-You can download the latest release (Aerial.Launcher-x.x.x.Setup.exe) from [releases](https://github.com/Ciensprog/Aerial-Launcher/releases) page.
+You can download the latest release (Aerial.Launcher-x.x.x.Setup.exe) from [releases](https://github.com/barasalah2/Aerial-Launcher/releases) page.
 
 ### Good To Know
 
@@ -158,12 +158,12 @@ You can access the [STW News](https://stw.news/) profile of the selected account
 
 ## 🤝 Contributing
 
-1. [Fork this repository](https://github.com/Ciensprog/Aerial-Launcher/fork).
+1. [Fork this repository](https://github.com/barasalah2/Aerial-Launcher/fork).
 1. Clone your fork `git clone https://github.com/YOUR_USERNAME/Aerial-Launcher.git`
 1. Create a new branch `git checkout -b new-feature`. Note: replace _new-feature_ text if you want.
 1. When you are ready, stage changes with `git add .`
 1. Commit your changes `git commit 'my new feature'`
 1. Push your commit `git push origin new-feature`
-1. [Submit a Pull Request](https://github.com/Ciensprog/Aerial-Launcher/pulls).
+1. [Submit a Pull Request](https://github.com/barasalah2/Aerial-Launcher/pulls).
 
-Alternatively, you can [create an issue](https://github.com/Ciensprog/Aerial-Launcher/issues/new) for reporting any bugs that you find.
+Alternatively, you can [create an issue](https://github.com/barasalah2/Aerial-Launcher/issues/new) for reporting any bugs that you find.

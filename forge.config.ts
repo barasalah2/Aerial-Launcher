@@ -5,7 +5,10 @@ import { FusesPlugin } from '@electron-forge/plugin-fuses'
 import { VitePlugin } from '@electron-forge/plugin-vite'
 import { FuseV1Options, FuseVersion } from '@electron/fuses'
 
-import packageJson from './package.json'
+import {
+  repositoryOwner,
+  repositoryRawURL,
+} from './src/config/about/links'
 
 const config: ForgeConfig = {
   packagerConfig: {
@@ -15,7 +18,7 @@ const config: ForgeConfig = {
   rebuildConfig: {},
   makers: [
     new MakerSquirrel({
-      iconUrl: `https://raw.githubusercontent.com/${packageJson.author.name}/Aerial-Launcher/main/icon-transparent.ico`,
+      iconUrl: `${repositoryRawURL}/icon-transparent.ico`,
       setupIcon: 'icon-transparent.ico',
     }),
   ],
@@ -61,8 +64,8 @@ const config: ForgeConfig = {
         generateReleaseNotes: true,
         prerelease: false,
         repository: {
-          owner: packageJson.author.name,
-          name: packageJson.name,
+          owner: repositoryOwner,
+          name: 'Aerial-Launcher',
         },
       },
     },

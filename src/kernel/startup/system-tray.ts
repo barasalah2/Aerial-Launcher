@@ -1,6 +1,6 @@
 import { Menu, nativeImage, Tray } from 'electron'
 
-import packageJson from '../../../package.json'
+import { repositoryRawURL } from '../../config/about/links'
 import { MainWindow } from './windows/main'
 
 export class SystemTray {
@@ -22,7 +22,7 @@ export class SystemTray {
 
     try {
       const responseFetch = await fetch(
-        `https://raw.githubusercontent.com/${packageJson.author.name}/Aerial-Launcher/main/icon-transparent.png`
+        `${repositoryRawURL}/icon-transparent.png`
       )
       const responseBlob = await responseFetch.blob()
       const arrayBuffer = await responseBlob.arrayBuffer()
