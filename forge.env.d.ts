@@ -1,3 +1,5 @@
+/// <reference types="vite/client" />
+
 import { availableElectronAPIs } from './src/kernel/preload'
 import { router } from './src/app'
 
