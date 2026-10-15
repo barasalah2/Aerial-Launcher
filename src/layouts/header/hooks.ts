@@ -35,7 +35,11 @@ export function useHandlers() {
       window.electronAPI.onNotificationLauncher(async (data) => {
         toast(
           t(
-            `launch-game.notifications.${data.status ? 'success' : 'error'}`,
+            data.status
+              ? 'launch-game.notifications.success'
+              : data.reason
+                ? `launch-game.notifications.errors.${data.reason}`
+                : 'launch-game.notifications.error',
             {
               name: parseCustomDisplayName(data.account),
             }

@@ -89,7 +89,12 @@
     "button": "Launch Game",
     "notifications": {
       "success": "The game has been launched with the account {{name}}",
-      "error": "An error has occurred launching game with account {{name}}, try again later"
+      "error": "An error has occurred launching game with account {{name}}, try again later",
+      "errors": {
+        "auth": "Couldn't sign in with {{name}}. Try adding the account again",
+        "egl-not-running": "Open Epic Games Launcher first, then launch {{name}} again",
+        "game-not-found": "FortniteLauncher.exe wasn't found in the game path. Check the path in Settings"
+      }
     }
   },
   "close-game": {

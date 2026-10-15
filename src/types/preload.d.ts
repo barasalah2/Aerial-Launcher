@@ -38,8 +38,15 @@ export type CommonNotificationCallbackResponseParam<
   status: boolean
 } & Extra
 
+export type LauncherErrorReason =
+  | 'auth'
+  | 'egl-not-running'
+  | 'game-not-found'
+
 export type LauncherNotificationCallbackResponseParam =
-  CommonNotificationCallbackResponseParam
+  CommonNotificationCallbackResponseParam<{
+    reason?: LauncherErrorReason
+  }>
 
 export type EpicGamesSettingsNotificationCallbackResponseParam =
   CommonNotificationCallbackResponseParam & {
