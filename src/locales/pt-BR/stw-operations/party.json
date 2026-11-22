@@ -90,5 +90,9 @@
       "selected-accounts": "Contas selecionadas",
       "friendship-with": "Amizade com as contas selecionadas"
     }
+  },
+  "note": {
+    "title": "Nota:",
+    "description": "Se você encontrar algum bug ou problema com esses recursos, pode reportar no servidor do Discord. Ou pode considerar contribuir, se quiser."
   }
 }

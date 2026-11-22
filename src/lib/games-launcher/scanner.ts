@@ -7,6 +7,8 @@ import { getEglv2Installations } from '../../kernel/core/eglv2'
 
 export type ScannedGame = EpicGameEntry & {
   exePath: string
+  launchCommand?: string
+  namespace: string
 }
 
 type Eglv1Manifest = {
@@ -14,6 +16,7 @@ type Eglv1Manifest = {
   CatalogNamespace: string
   DisplayName: string
   InstallLocation: string
+  LaunchCommand?: string
   LaunchExecutable: string
   bIsIncompleteInstall: boolean
 }
@@ -42,6 +45,7 @@ export function scanEpicGames(): ScannedGame[] {
           namespace: installation.namespace,
           displayName: path.basename(installation.dir),
           dir: installation.dir,
+          launchCommand: installation.launchCommand,
           launchExecutable: installation.launchExecutable ?? '',
           complete: installation.complete === true,
         }))
@@ -50,6 +54,7 @@ export function scanEpicGames(): ScannedGame[] {
           namespace: manifest.CatalogNamespace,
           displayName: manifest.DisplayName,
           dir: manifest.InstallLocation,
+          launchCommand: manifest.LaunchCommand,
           launchExecutable: manifest.LaunchExecutable,
           complete: !manifest.bIsIncompleteInstall,
         }))
@@ -63,8 +68,10 @@ export function scanEpicGames(): ScannedGame[] {
     )
     .map((installation) => ({
       appName: installation.appName,
-      displayName: installation.displayName,
+      displayName: installation.displayName.replace(/®/g, '').trim(),
       exePath: path.join(installation.dir, installation.launchExecutable),
+      launchCommand: installation.launchCommand?.trim() || undefined,
+      namespace: installation.namespace,
     }))
     .filter((game) => existsSync(game.exePath))
     .sort((a, b) => a.displayName.localeCompare(b.displayName))

@@ -21,6 +21,7 @@ export const appLanguageSchema = z.object({
       Language.Portuguese,
       Language.Polish,
       Language.Italian,
+      Language.Japanese,
     ])
     .default(Language.English),
 })
@@ -66,7 +67,7 @@ export const customizableMenuSettingsSchema = z
     llamaManager: z.boolean().default(true),
     itemShop: z.boolean().default(true),
     collectionBook: z.boolean().default(true),
-    unlock: z.boolean().default(true),
+    unlock: z.boolean().default(false),
 
     accountManagement: z.boolean().default(true),
     vbucksInformation: z.boolean().default(true),

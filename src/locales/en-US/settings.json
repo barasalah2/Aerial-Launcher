@@ -43,7 +43,8 @@
       },
       "tray": {
         "label": "Hide to system tray"
-      }
+      },
+      "epic-games-dir": {}
     }
   },
   "custom-menu": {
@@ -75,6 +76,35 @@
       "status": {
         "success": "Information updated"
       }
+    }
+  },
+  "appearance": {
+    "title": "Appearance",
+    "theme": {
+      "label": "Theme",
+      "options": {
+        "dark": "Dark",
+        "black": "Black",
+        "slate": "Slate"
+      }
+    },
+    "accent": {
+      "label": "Accent colour",
+      "description": "Used for buttons, highlights and the active menu item.",
+      "options": {
+        "default": "Default",
+        "stonewood": "Stonewood",
+        "plankerton": "Plankerton",
+        "canny-valley": "Canny Valley",
+        "twine-peaks": "Twine Peaks",
+        "ventures": "Ventures"
+      }
+    },
+    "sidebar": {
+      "label": "Sidebar",
+      "compact": "Compact sidebar",
+      "order-description": "Drag to change the order of the sections.",
+      "reset": "Reset"
     }
   }
 }

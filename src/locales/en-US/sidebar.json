@@ -58,5 +58,6 @@
   "version": {
     "release": "Release v{{version}}",
     "all-releases": "All Releases"
-  }
+  },
+  "current-alerts": "Current Alerts"
 }

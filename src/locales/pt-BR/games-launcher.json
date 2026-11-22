@@ -1,0 +1,19 @@
+{
+  "title": "Iniciador de jogos",
+  "description": "Inicie jogos da Epic com a conta selecionada no cabeçalho.",
+  "loading": "Procurando jogos instalados...",
+  "empty": "Nenhum jogo da Epic instalado foi encontrado.",
+  "launch": "Iniciar",
+  "launching": "Iniciando...",
+  "notifications": {
+    "scan-error": "Falha ao procurar jogos da Epic.",
+    "no-account": "Selecione uma conta no cabeçalho primeiro.",
+    "launch-success": "{{game}} iniciado como {{account}}.",
+    "launch-error": "Falha ao iniciar {{game}}.",
+    "errors": {
+      "auth": "Não foi possível entrar para iniciar {{game}}. Tente adicionar a conta novamente.",
+      "egl-not-running": "Abra o Epic Games Launcher primeiro e depois inicie {{game}} novamente.",
+      "game-not-found": "{{game}} não foi encontrado. Abra esta página novamente para procurar outra vez."
+    }
+  }
+}

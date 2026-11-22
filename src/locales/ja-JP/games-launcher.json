@@ -1,0 +1,19 @@
+{
+  "title": "ゲームランチャー",
+  "description": "ヘッダーで選択したアカウントで Epic のゲームを起動します。",
+  "loading": "インストール済みのゲームを検索中...",
+  "empty": "インストール済みの Epic ゲームが見つかりません。",
+  "launch": "起動",
+  "launching": "起動中...",
+  "notifications": {
+    "scan-error": "Epic ゲームの検索に失敗しました。",
+    "no-account": "先にヘッダーでアカウントを選択してください。",
+    "launch-success": "{{account}} で {{game}} を起動しました。",
+    "launch-error": "{{game}} の起動に失敗しました。",
+    "errors": {
+      "auth": "{{game}} を起動するためのログインに失敗しました。アカウントを追加し直してください。",
+      "egl-not-running": "先に Epic Games Launcher を開いてから、もう一度 {{game}} を起動してください。",
+      "game-not-found": "{{game}} が見つかりません。このページを開き直して再検索してください。"
+    }
+  }
+}

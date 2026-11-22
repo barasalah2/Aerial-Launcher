@@ -29,6 +29,7 @@ import { Toaster } from './components/ui/sonner'
 import { ThemeProvider } from './components/theme-provider'
 
 import 'dayjs/locale/es'
+import 'dayjs/locale/ja'
 import './locale'
 
 dayjs.extend(localizedFormat)

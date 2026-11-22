@@ -1,0 +1,19 @@
+{
+  "title": "游戏启动器",
+  "description": "使用顶部选中的账号启动 Epic 游戏。",
+  "loading": "正在扫描已安装的游戏...",
+  "empty": "未找到已安装的 Epic 游戏。",
+  "launch": "启动",
+  "launching": "正在启动...",
+  "notifications": {
+    "scan-error": "扫描 Epic 游戏失败。",
+    "no-account": "请先在顶部选择一个账号。",
+    "launch-success": "已以 {{account}} 身份启动 {{game}}。",
+    "launch-error": "启动 {{game}} 失败。",
+    "errors": {
+      "auth": "无法登录以启动 {{game}}。请尝试重新添加该账号。",
+      "egl-not-running": "请先打开 Epic Games Launcher，然后再次启动 {{game}}。",
+      "game-not-found": "未找到 {{game}}。重新打开此页面以再次扫描。"
+    }
+  }
+}

@@ -4,24 +4,36 @@ import type { LauncherErrorReason } from '../../types/preload'
 import type { ScannedGame } from '../../lib/games-launcher/scanner'
 
 import childProcess from 'node:child_process'
-import { existsSync } from 'node:fs'
+import { existsSync, readdirSync, statSync } from 'node:fs'
 import path from 'node:path'
+
+import { app } from 'electron'
 
 import { ElectronAPIEventKeys } from '../../config/constants/main-process'
 
 import { getLauncherExchangeCode } from '../../lib/epic/launcher-exchange'
 import { scanEpicGames } from '../../lib/games-launcher/scanner'
+import { parseCustomDisplayName } from '../../lib/utils'
 
 import { MainWindow } from '../startup/windows/main'
 import { Authentication } from './authentication'
 import { eglv2ApiPath, isEglv2Running } from './eglv2'
 
 export class GamesLauncher {
-  static scan(): EpicGameEntry[] {
-    return scanEpicGames().map(({ appName, displayName }) => ({
-      appName,
-      displayName,
-    }))
+  static async scan(): Promise<EpicGameEntry[]> {
+    return Promise.all(
+      scanEpicGames().map(async ({ appName, displayName, exePath }) => {
+        const icon = await app
+          .getFileIcon(getIconExe(exePath), { size: 'large' })
+          .catch(() => null)
+
+        return {
+          appName,
+          displayName,
+          icon: icon && !icon.isEmpty() ? icon.toDataURL() : undefined,
+        }
+      })
+    )
   }
 
   /** Only the appName comes from the renderer, the exe comes from our own scan */
@@ -72,6 +84,7 @@ export class GamesLauncher {
       const gameProcess = childProcess.spawn(
         game.exePath,
         [
+          ...splitLaunchCommand(game.launchCommand),
           ...(isEglv2 ? ['-eglv2', `-eglv2apipath=${eglv2ApiPath}`] : []),
           '-AUTH_LOGIN=unused',
           `-AUTH_PASSWORD=${exchangeCode}`,
@@ -79,6 +92,8 @@ export class GamesLauncher {
           `-epicapp=${game.appName}`,
           '-epicenv=Prod',
           '-EpicPortal',
+          `-epicsandboxid=${game.namespace}`,
+          `-epicusername=${parseCustomDisplayName(account)}`,
           `-epicuserid=${account.accountId}`,
         ],
         {
@@ -98,5 +113,52 @@ export class GamesLauncher {
     } catch {
       sendResult(false)
     }
+  }
+}
+
+/**
+ * Splits a manifest LaunchCommand ("-foo -bar=\"a b\"") into arguments,
+ * honouring double quotes
+ */
+function splitLaunchCommand(value?: string) {
+  return (value?.match(/(?:[^\s"]+|"[^"]*")+/g) ?? []).map((part) =>
+    part.replace(/"/g, '')
+  )
+}
+
+/**
+ * Some games launch through a small stub exe without an icon (e.g.
+ * TheEscapists.exe next to TheEscapists_EFIGS.exe): use the largest
+ * sibling exe sharing its name instead
+ */
+function getIconExe(exePath: string) {
+  try {
+    const stubMaxBytes = 1024 * 1024
+    const exeSize = statSync(exePath).size
+
+    if (exeSize > stubMaxBytes) {
+      return exePath
+    }
+
+    const directory = path.dirname(exePath)
+    const exeName = path.basename(exePath).toLowerCase()
+    const baseName = path.basename(exePath, path.extname(exePath)).toLowerCase()
+    const largest = readdirSync(directory)
+      .filter((file) => {
+        const lower = file.toLowerCase()
+
+        return (
+          lower.endsWith('.exe') &&
+          lower.startsWith(baseName) &&
+          lower !== exeName
+        )
+      })
+      .map((file) => path.join(directory, file))
+      .map((filePath) => ({ filePath, size: statSync(filePath).size }))
+      .sort((a, b) => b.size - a.size)[0]
+
+    return largest && largest.size > exeSize ? largest.filePath : exePath
+  } catch {
+    return exePath
   }
 }

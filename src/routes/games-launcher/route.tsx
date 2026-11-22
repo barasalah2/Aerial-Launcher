@@ -132,7 +132,15 @@ function GamesLauncherPage() {
                 >
                   <div className="flex min-w-0 flex-1 items-center gap-4">
                     <div className="flex size-10 shrink-0 items-center justify-center rounded-md bg-muted">
-                      <Gamepad2 className="size-5 text-muted-foreground" />
+                      {game.icon ? (
+                        <img
+                          src={game.icon}
+                          alt=""
+                          className="size-8 object-contain"
+                        />
+                      ) : (
+                        <Gamepad2 className="size-5 text-muted-foreground" />
+                      )}
                     </div>
                     <span className="truncate font-medium">
                       {game.displayName}

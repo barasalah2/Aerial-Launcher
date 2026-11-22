@@ -1,0 +1,19 @@
+{
+  "title": "Avvio giochi",
+  "description": "Avvia i giochi Epic con l'account selezionato nell'intestazione.",
+  "loading": "Ricerca dei giochi installati...",
+  "empty": "Nessun gioco Epic installato trovato.",
+  "launch": "Avvia",
+  "launching": "Avvio in corso...",
+  "notifications": {
+    "scan-error": "Impossibile cercare i giochi Epic.",
+    "no-account": "Seleziona prima un account nell'intestazione.",
+    "launch-success": "{{game}} avviato come {{account}}.",
+    "launch-error": "Impossibile avviare {{game}}.",
+    "errors": {
+      "auth": "Impossibile accedere per avviare {{game}}. Prova ad aggiungere di nuovo l'account.",
+      "egl-not-running": "Apri prima Epic Games Launcher, poi avvia di nuovo {{game}}.",
+      "game-not-found": "{{game}} non trovato. Riapri questa pagina per cercare di nuovo."
+    }
+  }
+}

@@ -43,7 +43,8 @@
       },
       "tray": {
         "label": "Ocultar en la bandeja del sistema"
-      }
+      },
+      "epic-games-dir": {}
     }
   },
   "custom-menu": {
@@ -75,6 +76,35 @@
       "status": {
         "success": "Información actualizada"
       }
+    }
+  },
+  "appearance": {
+    "title": "Apariencia",
+    "theme": {
+      "label": "Tema",
+      "options": {
+        "dark": "Oscuro",
+        "black": "Negro",
+        "slate": "Pizarra"
+      }
+    },
+    "accent": {
+      "label": "Color de acento",
+      "description": "Se usa en botones, resaltados y el elemento activo del menú.",
+      "options": {
+        "default": "Predeterminado",
+        "stonewood": "Bosque Pedregoso",
+        "plankerton": "Villa Tablón",
+        "canny-valley": "Valle Latoso",
+        "twine-peaks": "Cumbres Leñosas",
+        "ventures": "Aventuras"
+      }
+    },
+    "sidebar": {
+      "label": "Barra lateral",
+      "compact": "Barra lateral compacta",
+      "order-description": "Arrastra para cambiar el orden de las secciones.",
+      "reset": "Restablecer"
     }
   }
 }
