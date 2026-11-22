@@ -3,6 +3,8 @@ on:
   push:
     tags:
       - 'v*'
+  # Lets a release be rebuilt from the Actions tab without moving its tag
+  workflow_dispatch:
 
 permissions:
   contents: write
