@@ -71,8 +71,10 @@ export type WorldInfoMission = {
     alert: {
       rewards: Array<
         {
+          fallbackUrl?: string
           itemId: string
           imageUrl: string
+          name?: string
           quantity: number
           rarity: RarityType
         } & Pick<ParseResourceData, 'type'>
@@ -84,10 +86,12 @@ export type WorldInfoMission = {
         imageUrl: string
       }>
       rewards: Array<{
+        fallbackUrl?: string
         imageUrl: string
         itemId: string
         isBad: boolean
         key: string
+        name?: string
         quantity: number
       }>
       zone: {

@@ -10,13 +10,18 @@
       "party": "Party",
       "save-quests": "Save Quests",
       "daily-quests": "Daily Quests",
+      "auto-daily-quests": "Auto Daily Quests",
+      "dq-weapons": "DQ Weapons",
+      "storm-shields": "Storm Shields",
       "homebase-name": "Homebase Name",
       "xp-boosts": "XP Boosts",
       "auto-pin-urns": "Auto-pin Urns",
       "auto-llamas": "Auto-llamas",
       "llama-manager": "Llama Manager",
       "item-shop": "Item Shop",
+      "stw-shop": "STW Shop",
       "collection-book": "Collection Book",
+      "account-info": "Account Information",
       "unlock": "Unlock SSD Rewards"
     },
     "auto-kick-status": {
@@ -28,6 +33,10 @@
     "title": "Account Management",
     "options": {
       "vbucks-information": "V-Bucks Information",
+      "cloud-storage": "Cloud Storage",
+      "account-export": "Account Export",
+      "ban-status": "Ban Status",
+      "sprites": "Sprites",
       "redeem-codes": "Redeem Codes",
       "devices-auth": "Devices Auth",
       "epic-settings": "Epic Games Settings"

@@ -13,8 +13,10 @@ import {
   BookOpen,
   Bot,
   CarTaxiFront,
+  Cloud,
   Coins,
   Copyright,
+  Download,
   FileText,
   Gamepad2,
   Globe,
@@ -28,11 +30,16 @@ import {
   Radar,
   ScrollText,
   Settings,
+  Shield,
+  ShieldAlert,
   ShoppingBag,
   Sparkles,
+  Store,
+  Swords,
   Ticket,
   Unlock,
   UserMinus,
+  UserRound,
   Zap,
 } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
@@ -277,6 +284,42 @@ export function SidebarMenu({
                     </Link>
                   </li>
                 )}
+                {getMenuOptionVisibility('dqWeapons') && (
+                  <li className="item">
+                    <Link
+                      to="/stw-operations/dq-weapons"
+                      className={currentClassNameHover}
+                      activeProps={{
+                        className: cn(activeClassName),
+                      }}
+                      onClick={goToPage}
+                      onAuxClick={whatIsThis()}
+                    >
+                      <span className="flex gap-2 items-center">
+                        <Swords className="size-3.5 shrink-0 opacity-80" />
+                        {t('stw-operations.options.dq-weapons')}
+                      </span>
+                    </Link>
+                  </li>
+                )}
+                {getMenuOptionVisibility('stormShields') && (
+                  <li className="item">
+                    <Link
+                      to="/stw-operations/storm-shields"
+                      className={currentClassNameHover}
+                      activeProps={{
+                        className: cn(activeClassName),
+                      }}
+                      onClick={goToPage}
+                      onAuxClick={whatIsThis()}
+                    >
+                      <span className="flex gap-2 items-center">
+                        <Shield className="size-3.5 shrink-0 opacity-80" />
+                        {t('stw-operations.options.storm-shields')}
+                      </span>
+                    </Link>
+                  </li>
+                )}
                 {getMenuOptionVisibility('homebaseName') && (
                   <li className="item">
                     <Link
@@ -367,6 +410,24 @@ export function SidebarMenu({
                     </Link>
                   </li>
                 )}
+                {getMenuOptionVisibility('stwShop') && (
+                  <li className="item">
+                    <Link
+                      to="/stw-operations/stw-shop"
+                      className={currentClassNameHover}
+                      activeProps={{
+                        className: cn(activeClassName),
+                      }}
+                      onClick={goToPage}
+                      onAuxClick={whatIsThis()}
+                    >
+                      <span className="flex gap-2 items-center">
+                        <Store className="size-3.5 shrink-0 opacity-80" />
+                        {t('stw-operations.options.stw-shop')}
+                      </span>
+                    </Link>
+                  </li>
+                )}
                 {getMenuOptionVisibility('llamaManager') && (
                   <li className="item">
                     <Link
@@ -399,6 +460,24 @@ export function SidebarMenu({
                       <span className="flex gap-2 items-center">
                         <BookOpen className="size-3.5 shrink-0 opacity-80" />
                         {t('stw-operations.options.collection-book')}
+                      </span>
+                    </Link>
+                  </li>
+                )}
+                {getMenuOptionVisibility('accountInfo') && (
+                  <li className="item">
+                    <Link
+                      to="/stw-operations/account-info"
+                      className={currentClassNameHover}
+                      activeProps={{
+                        className: cn(activeClassName),
+                      }}
+                      onClick={goToPage}
+                      onAuxClick={whatIsThis()}
+                    >
+                      <span className="flex gap-2 items-center">
+                        <UserRound className="size-3.5 shrink-0 opacity-80" />
+                        {t('stw-operations.options.account-info')}
                       </span>
                     </Link>
                   </li>
@@ -457,6 +536,67 @@ export function SidebarMenu({
                         {t(
                           'account-management.options.vbucks-information',
                         )}
+                      </span>
+                    </Link>
+                  </li>
+                )}
+                {getMenuOptionVisibility('cloudStorage') && (
+                  <li className="item">
+                    <Link
+                      to="/stw-operations/cloud-storage"
+                      className={currentClassNameHover}
+                      activeProps={{
+                        className: cn(activeClassName),
+                      }}
+                      onClick={goToPage}
+                      onAuxClick={whatIsThis()}
+                    >
+                      <span className="flex gap-2 items-center">
+                        <Cloud className="size-3.5 shrink-0 opacity-80" />
+                        {t('account-management.options.cloud-storage')}
+                      </span>
+                    </Link>
+                  </li>
+                )}
+                {getMenuOptionVisibility('accountExport') && (
+                  <li className="item">
+                    <Link
+                      to="/account-management/account-export"
+                      className={currentClassNameHover}
+                      activeProps={{
+                        className: cn(activeClassName),
+                      }}
+                      onClick={goToPage}
+                      onAuxClick={whatIsThis()}
+                    >
+                      <span className="flex gap-2 items-center">
+                        <Download className="size-3.5 shrink-0 opacity-80" />
+                        {t('account-management.options.account-export')}
+                      </span>
+                    </Link>
+                  </li>
+                )}
+                {getMenuOptionVisibility('banStatus') && (
+                  <li className="item">
+                    <Link
+                      to="/account-management/ban-status"
+                      className={cn({
+                        [currentClassNameHover]: areThereAccounts,
+                        'cursor-not-allowed opacity-60':
+                          !areThereAccounts,
+                      })}
+                      activeProps={{
+                        className: cn({
+                          [activeClassName]: areThereAccounts,
+                        }),
+                      }}
+                      onClick={goToPage}
+                      onAuxClick={whatIsThis()}
+                      disabled={!areThereAccounts}
+                    >
+                      <span className="flex gap-2 items-center">
+                        <ShieldAlert className="size-3.5 shrink-0 opacity-80" />
+                        {t('account-management.options.ban-status')}
                       </span>
                     </Link>
                   </li>

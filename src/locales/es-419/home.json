@@ -79,6 +79,15 @@
       "error": "No se puede cargar el archivo World Info, por favor revisa si es correcto y no le falte datos"
     }
   },
+  "check": {
+    "submit": "Check",
+    "all-vbucks": "All V-Bucks today ({{count}})",
+    "missions-placeholder": "Select missions",
+    "no-missions": "No alerts in today's World Info",
+    "no-vbucks": "No V-Bucks missions today. Turn off All V-Bucks and pick a mission.",
+    "empty": "Select accounts and missions, then check completions.",
+    "summary": "{{done}}/{{total}} done"
+  },
   "results": {
     "empty": {
       "alerts-done": "Se encontraron alertas que no coinciden con las misiones actuales",

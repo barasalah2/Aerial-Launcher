@@ -10,11 +10,14 @@ export type ItemShopOffer = {
   rarity: string
   imageUrl: string | null
   iconFile?: string | null
+  searchNames?: Array<string>
   price: number
   regularPrice: number
   currencyType: string
   currencySubType: string
   giftable: boolean
+  inDate?: string | null
+  outDate?: string | null
   grants: Array<{
     templateId: string
     quantity: number

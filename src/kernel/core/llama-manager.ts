@@ -19,6 +19,7 @@ import { ElectronAPIEventKeys } from '../../config/constants/main-process'
 import { resourcesJson } from '../../config/constants/resources'
 
 import { Authentication } from './authentication'
+import { OverlayToasts } from './overlay-toasts'
 import { MainWindow } from '../startup/windows/main'
 import { AccountsManager } from '../startup/accounts'
 
@@ -174,6 +175,7 @@ function sendRewardsNotification({
     ElectronAPIEventKeys.ClaimRewardsClientGlobalSyncNotification,
     [result],
   )
+  OverlayToasts.show([result])
 }
 
 export class LlamaManager {

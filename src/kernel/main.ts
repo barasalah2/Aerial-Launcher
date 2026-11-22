@@ -11,7 +11,10 @@ import type {
 } from '../types/accounts'
 import type { AlertsDoneSearchPlayerConfig } from '../types/alerts'
 import type { AuthenticationByDeviceProperties } from '../types/authentication'
-import type { AutomationServiceActionConfig } from '../types/automation'
+import type {
+  AutomationLogFileSettings,
+  AutomationServiceActionConfig,
+} from '../types/automation'
 import type { GroupRecord } from '../types/groups'
 import type { CustomizableMenuSettings, Settings } from '../types/settings'
 import type { TagRecord } from '../types/tags'
@@ -31,6 +34,16 @@ import type {
   LlamaManagerOpenRequest,
   LlamaManagerPurchaseRequest,
 } from '../types/llama-manager'
+import type { AccountExportRequest } from '../types/account-export'
+import type { AccountInfoProfileId } from '../types/account-info'
+import type {
+  CloudStorageApplyRequest,
+  CloudStorageDownloadRequest,
+} from '../types/cloud-storage'
+import type {
+  StwShopBuyRequest,
+  StwShopSavedItem,
+} from '../types/stw-shop'
 import type {
   XPBoostsConsumePersonalData,
   XPBoostsConsumeTeammateData,
@@ -50,23 +63,32 @@ import { ElectronAPIEventKeys } from '../config/constants/main-process'
 
 import { AlertsDone } from './core/alerts'
 // import { AntiCheatProvider } from './core/anti-cheat-provider'
+import { AccountExport } from './core/account-export'
+import { BanStatus } from './core/ban-status'
 import { Authentication } from './core/authentication'
+import { AutomationLogFile } from './core/automation/log-file'
+import { CloudStorage } from './core/cloud-storage'
 import { ClaimRewards } from './core/claim-rewards'
+import { CollectionBookManager } from './core/collection-book'
 import { DevicesAuthManager } from './core/devices-auth'
 import { EULATracking } from './core/eula-tracking'
 import { FortniteLauncher } from './core/launcher'
 import { GamesLauncher } from './core/games-launcher'
-import { CollectionBookManager } from './core/collection-book'
 import { ItemShop } from './core/item-shop'
 import {
   registerItemShopProtocol,
   registerItemShopScheme,
 } from './core/item-shop-protocol'
 import { LlamaManager } from './core/llama-manager'
+import { StwShop } from './core/stw-shop'
 import {
+  AutoDailyQuests,
+  MCPAccountInfo,
   MCPClientQuestLogin,
   MCPDailyQuests,
+  MCPDqWeapons,
   MCPHomebaseName,
+  MCPStormShields,
 } from './core/mcp'
 import { MatchmakingTrack } from './core/matchmaking-track'
 import { Manifest } from './core/manifest'
@@ -105,6 +127,7 @@ import {
 
 import { Language } from '../locales/resources'
 import { CustomProcess } from './core/custom-process'
+import { OverlayToasts } from './core/overlay-toasts'
 
 dayjs.extend(localizedFormat)
 dayjs.extend(relativeTime)
@@ -151,6 +174,10 @@ void (() => {
     }
 
     MainWindow.setInstance(mainWindow)
+
+    mainWindow.on('closed', () => {
+      OverlayToasts.destroy()
+    })
 
     // and load the index.html of the app.
     if (MAIN_WINDOW_VITE_DEV_SERVER_URL) {
@@ -201,6 +228,8 @@ void (() => {
       //
     }
 
+    registerItemShopProtocol()
+
     ipcMain.on(ElectronAPIEventKeys.RequestAccounts, async () => {
       await AccountsManager.load()
     })
@@ -212,8 +241,6 @@ void (() => {
     ipcMain.on(ElectronAPIEventKeys.WorldInfoRequestData, async () => {
       await WorldInfoManager.requestForAdvanceSection()
     })
-
-    registerItemShopProtocol()
 
     MainWindow.setInstance(await createWindow())
 
@@ -442,6 +469,17 @@ void (() => {
       },
     )
 
+    ipcMain.handle(ElectronAPIEventKeys.DailyQuestsClaimAll, async () => {
+      await Promise.race([
+        AccountsManager.waitUntilLoaded(),
+        new Promise((resolve) => setTimeout(resolve, 20_000)),
+      ])
+
+      return MCPClientQuestLogin.claim([
+        ...AccountsManager.getAccounts().values(),
+      ])
+    })
+
     ipcMain.on(
       ElectronAPIEventKeys.DailyQuestsRequest,
       async (_, accounts: Array<AccountData>) => {
@@ -453,6 +491,144 @@ void (() => {
       ElectronAPIEventKeys.DailyQuestReroll,
       async (_, account: AccountData, questId: string) => {
         await MCPDailyQuests.reroll(account, questId)
+      },
+    )
+
+    ipcMain.on(ElectronAPIEventKeys.AutoDailyQuestsConfigRequest, async () => {
+      await AutoDailyQuests.publish()
+    })
+
+    ipcMain.on(
+      ElectronAPIEventKeys.AutoDailyQuestsConfigSave,
+      async (_, replaceIds: Array<string>) => {
+        await AutoDailyQuests.saveReplaceIds(replaceIds)
+      },
+    )
+
+    ipcMain.on(ElectronAPIEventKeys.AutoDailyQuestsRun, () => {
+      void AutoDailyQuests.kick({ forceEnabled: true })
+    })
+
+    ipcMain.on(ElectronAPIEventKeys.StwShopConfigRequest, () => {
+      void StwShop.publish()
+    })
+
+    ipcMain.on(
+      ElectronAPIEventKeys.StwShopConfigSave,
+      (
+        _,
+        config: {
+          enabled?: boolean
+          accountIds?: Array<string>
+          items?: Array<StwShopSavedItem>
+        },
+      ) => {
+        void StwShop.saveConfig(config)
+      },
+    )
+
+    ipcMain.on(
+      ElectronAPIEventKeys.StwShopLoadRequest,
+      (_, accounts: Array<AccountData>) => {
+        void StwShop.load(accounts)
+      },
+    )
+
+    ipcMain.on(
+      ElectronAPIEventKeys.StwShopBuyRequest,
+      (_, request: StwShopBuyRequest) => {
+        void StwShop.buy(request)
+      },
+    )
+
+    ipcMain.on(ElectronAPIEventKeys.StwShopAutoRun, (_, force?: boolean) => {
+      void StwShop.runAuto({ force: force === true })
+    })
+
+    ipcMain.on(
+      ElectronAPIEventKeys.DqWeaponsRequest,
+      async (_, accounts: Array<AccountData>) => {
+        await MCPDqWeapons.request(accounts)
+      },
+    )
+
+    ipcMain.on(
+      ElectronAPIEventKeys.DqWeaponsFavoriteRequest,
+      async (_, accounts: Array<AccountData>) => {
+        await MCPDqWeapons.favorite(accounts)
+      },
+    )
+
+    ipcMain.on(
+      ElectronAPIEventKeys.StormShieldsRequest,
+      async (_, accounts: Array<AccountData>) => {
+        await MCPStormShields.request(accounts)
+      },
+    )
+
+    ipcMain.on(
+      ElectronAPIEventKeys.AccountInfoRequest,
+      async (_, accounts: Array<AccountData>) => {
+        await MCPAccountInfo.request(accounts)
+      },
+    )
+
+    ipcMain.on(
+      ElectronAPIEventKeys.AccountInfoRecycleRequest,
+      async (
+        _,
+        account: AccountData,
+        itemId: string,
+        profileId?: AccountInfoProfileId,
+      ) => {
+        await MCPAccountInfo.recycle(account, itemId, profileId)
+      },
+    )
+
+    ipcMain.on(
+      ElectronAPIEventKeys.AccountInfoUpgradeRequest,
+      async (
+        _,
+        account: AccountData,
+        itemId: string,
+        profileId?: AccountInfoProfileId,
+      ) => {
+        await MCPAccountInfo.upgrade(account, itemId, profileId)
+      },
+    )
+
+    ipcMain.on(
+      ElectronAPIEventKeys.CloudStorageListRequest,
+      async (_, account: AccountData) => {
+        await CloudStorage.list(account)
+      },
+    )
+
+    ipcMain.on(
+      ElectronAPIEventKeys.CloudStorageDownloadRequest,
+      async (_, payload: CloudStorageDownloadRequest) => {
+        await CloudStorage.download(payload)
+      },
+    )
+
+    ipcMain.on(
+      ElectronAPIEventKeys.CloudStoragePickRequest,
+      async () => {
+        await CloudStorage.pick()
+      },
+    )
+
+    ipcMain.on(
+      ElectronAPIEventKeys.CloudStorageApplyRequest,
+      async (_, payload: CloudStorageApplyRequest) => {
+        await CloudStorage.apply(payload)
+      },
+    )
+
+    ipcMain.on(
+      ElectronAPIEventKeys.AccountExportRequest,
+      async (_, payload: AccountExportRequest['accounts']) => {
+        await AccountExport.exportAccounts({ accounts: payload })
       },
     )
 
@@ -570,15 +746,40 @@ void (() => {
 
     ipcMain.on(
       ElectronAPIEventKeys.PartyLookupPlayerAction,
-      async (_, accounts: AccountDataList, displayName: string) => {
+      async (
+        _,
+        accounts: AccountDataList,
+        displayName: string,
+      ) => {
         await Party.lookupPlayer(accounts, displayName)
       },
     )
 
     ipcMain.on(
       ElectronAPIEventKeys.PartySendFriendRequestAction,
-      async (_, accounts: AccountDataList, friendId: string) => {
+      async (
+        _,
+        accounts: AccountDataList,
+        friendId: string,
+      ) => {
         await Party.sendFriendRequests(accounts, friendId)
+      },
+    )
+
+    ipcMain.on(
+      ElectronAPIEventKeys.PartyIncomingFriendRequestsRequest,
+      async (_, accounts: AccountDataList) => {
+        await Party.listIncomingFriendRequests(accounts)
+      },
+    )
+
+    ipcMain.on(
+      ElectronAPIEventKeys.PartyAcceptIncomingFriendRequests,
+      async (
+        _,
+        items: Array<{ account: AccountData; friendId: string }>,
+      ) => {
+        await Party.acceptIncomingFriendRequests(items)
       },
     )
 
@@ -595,6 +796,42 @@ void (() => {
       },
     )
 
+    ipcMain.on(
+      ElectronAPIEventKeys.PartyStatusRequest,
+      async (_, accounts: Array<AccountData>) => {
+        await Party.requestStatus(accounts)
+      },
+    )
+
+    ipcMain.on(
+      ElectronAPIEventKeys.PartyStatusKickMember,
+      async (
+        _,
+        account: AccountData,
+        memberAccountId: string,
+      ) => {
+        await Party.kickStatusMember(account, memberAccountId)
+      },
+    )
+
+    ipcMain.on(
+      ElectronAPIEventKeys.PartyStatusPromoteMember,
+      async (
+        _,
+        account: AccountData,
+        memberAccountId: string,
+      ) => {
+        await Party.promoteStatusMember(account, memberAccountId)
+      },
+    )
+
+    ipcMain.on(
+      ElectronAPIEventKeys.PartyStatusLeave,
+      async (_, account: AccountData) => {
+        await Party.leaveStatus(account)
+      },
+    )
+
     /**
      * Advanced Mode
      */
@@ -603,6 +840,13 @@ void (() => {
       ElectronAPIEventKeys.HomeFetchPlayerRequest,
       async (_, config: AlertsDoneSearchPlayerConfig) => {
         await AlertsDone.fetchPlayerData(config)
+      },
+    )
+
+    ipcMain.on(
+      ElectronAPIEventKeys.AlertsDoneCheckRequest,
+      async (_, accounts: Array<AccountData>) => {
+        await AlertsDone.checkAccounts(accounts)
       },
     )
 
@@ -694,6 +938,27 @@ void (() => {
         await Automation.updateAction(accountId, config)
       },
     )
+
+    ipcMain.on(ElectronAPIEventKeys.AutomationLogFileRequest, async () => {
+      const status = await AutomationLogFile.getStatus()
+
+      MainWindow.instance.webContents.send(
+        ElectronAPIEventKeys.AutomationLogFileNotification,
+        status,
+      )
+      await AutomationLogFile.start()
+    })
+
+    ipcMain.on(
+      ElectronAPIEventKeys.AutomationLogFileUpdate,
+      async (_, partial: Partial<AutomationLogFileSettings>) => {
+        await AutomationLogFile.updateSettings(partial)
+      },
+    )
+
+    ipcMain.on(ElectronAPIEventKeys.AutomationLogFilePick, async () => {
+      await AutomationLogFile.pickLogFile()
+    })
 
     /**
      * Taxi Service
@@ -855,6 +1120,16 @@ void (() => {
     )
 
     ipcMain.on(
+      ElectronAPIEventKeys.LlamaManagerBulkPurchaseMini,
+      async (_, data: LlamaManagerBulkPurchaseRequest) => {
+        await LlamaManager.bulkPurchase({
+          ...data,
+          kind: data.kind ?? 'mini',
+        })
+      },
+    )
+
+    ipcMain.on(
       ElectronAPIEventKeys.LlamaManagerOpenPacks,
       async (_, data: LlamaManagerOpenRequest) => {
         await LlamaManager.openPacks(data)
@@ -948,6 +1223,13 @@ void (() => {
       ElectronAPIEventKeys.VBucksInformationRequest,
       async (_, accounts: Array<AccountData>) => {
         await VBucksInformation.requestBulkInfo(accounts)
+      },
+    )
+
+    ipcMain.on(
+      ElectronAPIEventKeys.BanStatusRequest,
+      async (_, accounts: Array<AccountData>) => {
+        await BanStatus.request(accounts)
       },
     )
 
@@ -1068,42 +1350,31 @@ void (() => {
     )
 
     /**
-     * Auto Daily Quests (ClientQuestLogin)
+     * Auto Daily Quests: once per UTC day, then replace the checked quests.
+     * Auto STW shop: once per weekly reset (Wednesday 00:00 UTC).
      */
 
-    const runAutoDailyQuests = async () => {
-      const settings = await SettingsManager.getData()
+    const runDailyMaintenance = () => {
+      void AutoDailyQuests.kick().then(() => {
+        if (new Date().getUTCDay() === 3) {
+          return StwShop.runAuto({ silent: true })
+        }
 
-      if (!settings.autoDailyQuests) {
-        return
-      }
-
-      const accounts = AccountsManager.getAccounts()
-
-      if (accounts.size > 0) {
-        MCPClientQuestLogin.save([...accounts.values()])
-      }
+        return undefined
+      })
     }
 
     schedule.scheduleJob(
       {
-        /**
-         * Runs: every reset at time: 00:01:00 AM
-         * Hour: 0 AM (midnight)
-         * Minute: 1
-         * Second: 0
-         */
         rule: '0 1 0 * * *',
-        /**
-         * Time zone
-         */
         tz: 'UTC',
       },
-      runAutoDailyQuests
+      runDailyMaintenance,
     )
 
-    // Startup trigger: run once after accounts have loaded
-    setTimeout(runAutoDailyQuests, 30_000)
+    setTimeout(() => {
+      void AutoDailyQuests.kick().then(() => StwShop.runAuto({ silent: true }))
+    }, 30_000)
   })
 
   // Quit when all windows are closed, except on macOS. There, it's common

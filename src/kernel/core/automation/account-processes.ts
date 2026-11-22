@@ -171,40 +171,29 @@ export class AccountProcess {
         automationAccount.actions.claim
       ) {
         this.clearMissionIntervalId()
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const tasks: Promise<any>[] = []
+        const accounts = [...AccountsManager.getAccounts().values()]
+
+        // Claim before kicking; a failed step must not skip the next one or
+        // the re-arm below (that silently stopped automation until restart)
+        if (automationAccount.actions.claim) {
+          await (
+            automationAccount.actions.claimParty
+              ? Party.claimPartyMembers(currentAccount, accounts, {
+                  useGlobalNotification: true,
+                })
+              : ClaimRewards.start([currentAccount], true)
+          ).catch((error) => {
+            console.error(`[Automation] Claim failed for ${this.accountId}:`, error)
+          })
+        }
 
         if (automationAccount.actions.kick) {
-          const accounts = AccountsManager.getAccounts()
-          tasks.push(
-            Party.kickPartyMembers(
-              currentAccount,
-              [...accounts.values()],
-              automationAccount.actions.claim ?? false,
-              {
-                useGlobalNotification: true,
-              },
-            ),
-          )
+          await Party.kickPartyMembers(currentAccount, accounts, false, {
+            useGlobalNotification: true,
+          }).catch((error) => {
+            console.error(`[Automation] Kick failed for ${this.accountId}:`, error)
+          })
         }
-
-        if (automationAccount.actions.claim) {
-          tasks.push(ClaimRewards.start([currentAccount], true))
-        }
-
-        // allSettled + always re-arming: previously a single failed kick
-        // or claim rejected Promise.all before preInit() ran, which
-        // silently stopped automation for this account until restart
-        const results = await Promise.allSettled(tasks)
-
-        results.forEach((result) => {
-          if (result.status === 'rejected') {
-            console.error(
-              `[Automation] Kick/claim failed for ${this.accountId}:`,
-              result.reason,
-            )
-          }
-        })
 
         this.preInit({ timeout: 1_000 })
 

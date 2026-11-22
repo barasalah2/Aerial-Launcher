@@ -187,6 +187,32 @@ function STWOperationsSection() {
         <div className="item">
           <Label
             className="title"
+            htmlFor="dq-weapons"
+          >
+            {t('stw-operations.options.dq-weapons')}
+          </Label>
+          <Switch
+            id="dq-weapons"
+            checked={getMenuOptionVisibility('dqWeapons')}
+            onCheckedChange={updateMenuOption('dqWeapons')}
+          />
+        </div>
+        <div className="item">
+          <Label
+            className="title"
+            htmlFor="storm-shields"
+          >
+            {t('stw-operations.options.storm-shields')}
+          </Label>
+          <Switch
+            id="storm-shields"
+            checked={getMenuOptionVisibility('stormShields')}
+            onCheckedChange={updateMenuOption('stormShields')}
+          />
+        </div>
+        <div className="item">
+          <Label
+            className="title"
             htmlFor="homebase-name"
           >
             {t('stw-operations.options.homebase-name')}
@@ -265,6 +291,19 @@ function STWOperationsSection() {
         <div className="item">
           <Label
             className="title"
+            htmlFor="stw-shop"
+          >
+            {t('stw-operations.options.stw-shop')}
+          </Label>
+          <Switch
+            id="stw-shop"
+            checked={getMenuOptionVisibility('stwShop')}
+            onCheckedChange={updateMenuOption('stwShop')}
+          />
+        </div>
+        <div className="item">
+          <Label
+            className="title"
             htmlFor="collection-book"
           >
             {t('stw-operations.options.collection-book')}
@@ -273,6 +312,19 @@ function STWOperationsSection() {
             id="collection-book"
             checked={getMenuOptionVisibility('collectionBook')}
             onCheckedChange={updateMenuOption('collectionBook')}
+          />
+        </div>
+        <div className="item">
+          <Label
+            className="title"
+            htmlFor="account-info"
+          >
+            {t('stw-operations.options.account-info')}
+          </Label>
+          <Switch
+            id="account-info"
+            checked={getMenuOptionVisibility('accountInfo')}
+            onCheckedChange={updateMenuOption('accountInfo')}
           />
         </div>
         <div className="item">
@@ -327,6 +379,45 @@ function AccountManagementSection() {
             id="vbucks-information"
             checked={getMenuOptionVisibility('vbucksInformation')}
             onCheckedChange={updateMenuOption('vbucksInformation')}
+          />
+        </div>
+        <div className="item">
+          <Label
+            className="title"
+            htmlFor="cloud-storage"
+          >
+            {t('account-management.options.cloud-storage')}
+          </Label>
+          <Switch
+            id="cloud-storage"
+            checked={getMenuOptionVisibility('cloudStorage')}
+            onCheckedChange={updateMenuOption('cloudStorage')}
+          />
+        </div>
+        <div className="item">
+          <Label
+            className="title"
+            htmlFor="account-export"
+          >
+            {t('account-management.options.account-export')}
+          </Label>
+          <Switch
+            id="account-export"
+            checked={getMenuOptionVisibility('accountExport')}
+            onCheckedChange={updateMenuOption('accountExport')}
+          />
+        </div>
+        <div className="item">
+          <Label
+            className="title"
+            htmlFor="ban-status"
+          >
+            {t('account-management.options.ban-status')}
+          </Label>
+          <Switch
+            id="ban-status"
+            checked={getMenuOptionVisibility('banStatus')}
+            onCheckedChange={updateMenuOption('banStatus')}
           />
         </div>
         <div className="item">

@@ -1,6 +1,9 @@
 import type { AccountList } from '../../types/accounts'
 import type { AutoLlamasRecord } from '../../types/auto-llamas'
-import type { AutomationAccountFileDataList } from '../../types/automation'
+import type {
+  AutomationAccountFileDataList,
+  AutomationLogFileSettings,
+} from '../../types/automation'
 import type { FriendRecord } from '../../types/friends'
 import type { GroupRecord } from '../../types/groups'
 import type {
@@ -17,6 +20,7 @@ import { mkdir, readdir, readFile, writeFile } from 'node:fs/promises'
 import path from 'node:path'
 
 import { defaultMissionInterval } from '../../config/constants/automation'
+import { defaultFortniteLogPath } from '../../lib/fortnite/log-file'
 import { defaultClaimingRewardsDelay } from '../../config/constants/mcp'
 
 import { accountListSchema } from '../../lib/validations/schemas/accounts'
@@ -130,6 +134,19 @@ export class DataDirectory {
   )
   private static automationDefaultData: AutomationAccountFileDataList = {}
 
+  static automationLogFilePath = path.join(
+    DataDirectory.dataDirectoryPath,
+    'automation-logfile.json',
+  )
+  private static automationLogFileDefaultData: AutomationLogFileSettings =
+    {
+      logPath: defaultFortniteLogPath(),
+      kick: false,
+      claim: false,
+      claimParty: false,
+      transferMats: false,
+    }
+
   static taxiServiceFilePath = path.join(
     DataDirectory.dataDirectoryPath,
     'taxi-service.json',
@@ -201,6 +218,7 @@ export class DataDirectory {
     await DataDirectory.getOrCreateFriendsJsonFile()
     await DataDirectory.getOrCreateMatchmakingJsonFile()
     await DataDirectory.getOrCreateAutomationJsonFile()
+    await DataDirectory.getOrCreateAutomationLogFileJsonFile()
     await DataDirectory.getOrCreateTaxiServiceJsonFile()
     await DataDirectory.getOrCreateUrnsJsonFile()
     await DataDirectory.getOrCreateAutoLlamasJsonFile()
@@ -442,6 +460,33 @@ export class DataDirectory {
   }
 
   /**
+   * Get data from automation-logfile.json
+   */
+  static async getAutomationLogFile(): Promise<AutomationLogFileSettings> {
+    const result = await DataDirectory.getOrCreateAutomationLogFileJsonFile()
+
+    try {
+      const parsed = JSON.parse(result) as Partial<AutomationLogFileSettings>
+      const defaults = DataDirectory.automationLogFileDefaultData
+
+      return {
+        logPath:
+          typeof parsed.logPath === 'string' && parsed.logPath.trim()
+            ? parsed.logPath
+            : defaults.logPath,
+        kick: Boolean(parsed.kick),
+        claim: Boolean(parsed.claim),
+        claimParty: Boolean(parsed.claimParty),
+        transferMats: Boolean(parsed.transferMats),
+      }
+    } catch {
+      //
+    }
+
+    return { ...DataDirectory.automationLogFileDefaultData }
+  }
+
+  /**
    * Get data from taxi-service.json
    */
   static async getTaxiServiceFile(): Promise<{
@@ -604,6 +649,16 @@ export class DataDirectory {
   static async updateAutomationFile(data: AutomationAccountFileDataList) {
     await DataDirectory.updateJsonFile(
       DataDirectory.automationFilePath,
+      data,
+    )
+  }
+
+  /**
+   * Update automation-logfile.json
+   */
+  static async updateAutomationLogFile(data: AutomationLogFileSettings) {
+    await DataDirectory.updateJsonFile(
+      DataDirectory.automationLogFilePath,
       data,
     )
   }
@@ -809,6 +864,23 @@ export class DataDirectory {
 
     return await DataDirectory.getOrCreateJsonFile(
       DataDirectory.automationFilePath,
+      {
+        defaults: {
+          rawString: JSON.stringify(initialData),
+          value: initialData,
+        },
+      },
+    )
+  }
+
+  /**
+   * Creating automation-logfile.json
+   */
+  private static async getOrCreateAutomationLogFileJsonFile() {
+    const initialData = DataDirectory.automationLogFileDefaultData
+
+    return await DataDirectory.getOrCreateJsonFile(
+      DataDirectory.automationLogFilePath,
       {
         defaults: {
           rawString: JSON.stringify(initialData),

@@ -10,6 +10,7 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from '../ui/accordion'
+import { RewardIcon } from '../reward-icon'
 import { ScrollArea } from '../ui/scroll-area'
 import { SheetClose } from '../ui/sheet'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/tabs'
@@ -26,6 +27,7 @@ import { parseResource } from '../../lib/parsers/resources'
 import { getShortDateFormat } from '../../lib/dates'
 import { assets } from '../../lib/repository'
 import { parseCustomDisplayName } from '../../lib/utils'
+import { claimedQuestTitles } from '../../lib/stw/reward-names'
 
 enum HistoryTabs {
   History = 'history',
@@ -200,7 +202,11 @@ function SummarySection() {
 
   const { accountList } = useGetAccounts()
   const { accountsSummary, globalSummary } = useParseSummary()
-  const isEmpty = Object.values(globalSummary.rewards).length <= 0
+  const accoladeTotal =
+    globalSummary.accolades.totalMissionXPRedeemed +
+    globalSummary.accolades.totalQuestXPRedeemed
+  const isEmpty =
+    Object.values(globalSummary.rewards).length <= 0 && accoladeTotal <= 0
 
   if (isEmpty) {
     return <EmptyHistoryMessage title={t('summary.empty')} />
@@ -290,13 +296,30 @@ function RewardSection({ data }: { data: RewardsNotification }) {
   const { t } = useTranslation(['general'])
 
   const { accountList } = useGetAccounts()
+  const quests = claimedQuestTitles(data)
 
   return (
     <div className="px-2">
       <div className="font-bold mb-2 break-all">
         {t(parseCustomDisplayName(accountList[data.accountId]))}:
       </div>
+      {quests.length > 0 ? (
+        <div className="mb-1 text-sm">
+          <div className="text-muted-foreground text-xs">Quests</div>
+          {quests.map((title, index) => (
+            <div key={`${title}-${index}`}>{title}</div>
+          ))}
+        </div>
+      ) : null}
       <ul className="space-y-1">
+        {data.endurance?.map((row) => (
+          <li
+            key={`${row.zone}-${row.wave}`}
+            className="text-sm"
+          >
+            {row.zone} Endurance · Wave {row.wave}
+          </li>
+        ))}
         <RewardItems rewards={data.rewards} />
         <AccoladesItem accolades={data.accolades} />
       </ul>
@@ -316,10 +339,12 @@ function RewardItems({ rewards }: Pick<RewardsNotification, 'rewards'>) {
   return items.map((item) => (
     <li key={item.itemType}>
       <figure className="flex gap-1 items-center">
-        <img
+        <RewardIcon
           src={item.imgUrl}
+          fallback={item.fallbackUrl}
           className="size-6"
           alt={item.name}
+          title={item.name}
         />
         <figcaption className="break-all">
           {numberWithCommaSeparator(item.quantity)} &times; {item.name}
@@ -332,6 +357,13 @@ function RewardItems({ rewards }: Pick<RewardsNotification, 'rewards'>) {
 function AccoladesItem({
   accolades,
 }: Pick<RewardsNotification, 'accolades'>) {
+  const total =
+    accolades.totalMissionXPRedeemed + accolades.totalQuestXPRedeemed
+
+  if (total <= 0) {
+    return null
+  }
+
   return (
     <li>
       <figure className="flex gap-1 items-center">
@@ -341,11 +373,7 @@ function AccoladesItem({
           alt="Accolades"
         />
         <figcaption className="break-all">
-          {numberWithCommaSeparator(
-            accolades.totalMissionXPRedeemed +
-              accolades.totalQuestXPRedeemed,
-          )}{' '}
-          &times; Accolades
+          {numberWithCommaSeparator(total)} &times; Accolades
         </figcaption>
       </figure>
     </li>

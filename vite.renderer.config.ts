@@ -10,4 +10,10 @@ export default defineConfig({
       onwarn,
     },
   },
+  server: {
+    watch: {
+      // Packaging writes to out/, which would reload the dev app
+      ignored: ['**/out/**', '**/.git/**'],
+    },
+  },
 })

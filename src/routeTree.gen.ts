@@ -12,6 +12,8 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as GamesLauncherRouteRouteImport } from './routes/games-launcher/route'
 import { Route as SettingsRouteRouteImport } from './routes/settings/route'
+import { Route as AccountManagementAccountExportRouteRouteImport } from './routes/account-management/account-export/route'
+import { Route as AccountManagementBanStatusRouteRouteImport } from './routes/account-management/ban-status/route'
 import { Route as AccountManagementDevicesAuthRouteRouteImport } from './routes/account-management/devices-auth/route'
 import { Route as AccountManagementEpicGamesSettingsRouteRouteImport } from './routes/account-management/epic-games-settings/route'
 import { Route as AccountManagementEulaRouteRouteImport } from './routes/account-management/eula/route'
@@ -21,15 +23,20 @@ import { Route as AccountsRemoveRouteRouteImport } from './routes/accounts/remov
 import { Route as AdvancedModeMatchmakingTrackRouteRouteImport } from './routes/advanced-mode/matchmaking-track/route'
 import { Route as AdvancedModeWorldInfoRouteRouteImport } from './routes/advanced-mode/world-info/route'
 import { Route as InformationCreditsRouteRouteImport } from './routes/information/credits/route'
+import { Route as StwOperationsAccountInfoRouteRouteImport } from './routes/stw-operations/account-info/route'
 import { Route as StwOperationsAutoLlamasRouteRouteImport } from './routes/stw-operations/auto-llamas/route'
 import { Route as StwOperationsAutomationRouteRouteImport } from './routes/stw-operations/automation/route'
+import { Route as StwOperationsCloudStorageRouteRouteImport } from './routes/stw-operations/cloud-storage/route'
 import { Route as StwOperationsCollectionBookRouteRouteImport } from './routes/stw-operations/collection-book/route'
 import { Route as StwOperationsDailyQuestsRouteRouteImport } from './routes/stw-operations/daily-quests/route'
+import { Route as StwOperationsDqWeaponsRouteRouteImport } from './routes/stw-operations/dq-weapons/route'
 import { Route as StwOperationsHomebaseNameRouteRouteImport } from './routes/stw-operations/homebase-name/route'
 import { Route as StwOperationsItemShopRouteRouteImport } from './routes/stw-operations/item-shop/route'
 import { Route as StwOperationsLlamaManagerRouteRouteImport } from './routes/stw-operations/llama-manager/route'
 import { Route as StwOperationsPartyRouteRouteImport } from './routes/stw-operations/party/route'
 import { Route as StwOperationsSaveQuestsRouteRouteImport } from './routes/stw-operations/save-quests/route'
+import { Route as StwOperationsStormShieldsRouteRouteImport } from './routes/stw-operations/storm-shields/route'
+import { Route as StwOperationsStwShopRouteRouteImport } from './routes/stw-operations/stw-shop/route'
 import { Route as StwOperationsTaxiServiceRouteRouteImport } from './routes/stw-operations/taxi-service/route'
 import { Route as StwOperationsUnlockRouteRouteImport } from './routes/stw-operations/unlock/route'
 import { Route as StwOperationsUrnsRouteRouteImport } from './routes/stw-operations/urns/route'
@@ -51,6 +58,18 @@ const SettingsRouteRoute = SettingsRouteRouteImport.update({
   path: '/settings',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AccountManagementAccountExportRouteRoute =
+  AccountManagementAccountExportRouteRouteImport.update({
+    id: '/account-management/account-export',
+    path: '/account-management/account-export',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const AccountManagementBanStatusRouteRoute =
+  AccountManagementBanStatusRouteRouteImport.update({
+    id: '/account-management/ban-status',
+    path: '/account-management/ban-status',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const AccountManagementDevicesAuthRouteRoute =
   AccountManagementDevicesAuthRouteRouteImport.update({
     id: '/account-management/devices-auth',
@@ -103,6 +122,12 @@ const InformationCreditsRouteRoute = InformationCreditsRouteRouteImport.update({
   path: '/information/credits',
   getParentRoute: () => rootRouteImport,
 } as any)
+const StwOperationsAccountInfoRouteRoute =
+  StwOperationsAccountInfoRouteRouteImport.update({
+    id: '/stw-operations/account-info',
+    path: '/stw-operations/account-info',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const StwOperationsAutoLlamasRouteRoute =
   StwOperationsAutoLlamasRouteRouteImport.update({
     id: '/stw-operations/auto-llamas',
@@ -115,6 +140,12 @@ const StwOperationsAutomationRouteRoute =
     path: '/stw-operations/automation',
     getParentRoute: () => rootRouteImport,
   } as any)
+const StwOperationsCloudStorageRouteRoute =
+  StwOperationsCloudStorageRouteRouteImport.update({
+    id: '/stw-operations/cloud-storage',
+    path: '/stw-operations/cloud-storage',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const StwOperationsCollectionBookRouteRoute =
   StwOperationsCollectionBookRouteRouteImport.update({
     id: '/stw-operations/collection-book',
@@ -125,6 +156,12 @@ const StwOperationsDailyQuestsRouteRoute =
   StwOperationsDailyQuestsRouteRouteImport.update({
     id: '/stw-operations/daily-quests',
     path: '/stw-operations/daily-quests',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const StwOperationsDqWeaponsRouteRoute =
+  StwOperationsDqWeaponsRouteRouteImport.update({
+    id: '/stw-operations/dq-weapons',
+    path: '/stw-operations/dq-weapons',
     getParentRoute: () => rootRouteImport,
   } as any)
 const StwOperationsHomebaseNameRouteRoute =
@@ -154,6 +191,18 @@ const StwOperationsSaveQuestsRouteRoute =
   StwOperationsSaveQuestsRouteRouteImport.update({
     id: '/stw-operations/save-quests',
     path: '/stw-operations/save-quests',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const StwOperationsStormShieldsRouteRoute =
+  StwOperationsStormShieldsRouteRouteImport.update({
+    id: '/stw-operations/storm-shields',
+    path: '/stw-operations/storm-shields',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const StwOperationsStwShopRouteRoute =
+  StwOperationsStwShopRouteRouteImport.update({
+    id: '/stw-operations/stw-shop',
+    path: '/stw-operations/stw-shop',
     getParentRoute: () => rootRouteImport,
   } as any)
 const StwOperationsTaxiServiceRouteRoute =
@@ -189,6 +238,8 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/games-launcher': typeof GamesLauncherRouteRoute
   '/settings': typeof SettingsRouteRoute
+  '/account-management/account-export': typeof AccountManagementAccountExportRouteRoute
+  '/account-management/ban-status': typeof AccountManagementBanStatusRouteRoute
   '/account-management/devices-auth': typeof AccountManagementDevicesAuthRouteRoute
   '/account-management/epic-games-settings': typeof AccountManagementEpicGamesSettingsRouteRoute
   '/account-management/eula': typeof AccountManagementEulaRouteRoute
@@ -198,15 +249,20 @@ export interface FileRoutesByFullPath {
   '/advanced-mode/matchmaking-track': typeof AdvancedModeMatchmakingTrackRouteRoute
   '/advanced-mode/world-info': typeof AdvancedModeWorldInfoRouteRoute
   '/information/credits': typeof InformationCreditsRouteRoute
+  '/stw-operations/account-info': typeof StwOperationsAccountInfoRouteRoute
   '/stw-operations/auto-llamas': typeof StwOperationsAutoLlamasRouteRoute
   '/stw-operations/automation': typeof StwOperationsAutomationRouteRoute
+  '/stw-operations/cloud-storage': typeof StwOperationsCloudStorageRouteRoute
   '/stw-operations/collection-book': typeof StwOperationsCollectionBookRouteRoute
   '/stw-operations/daily-quests': typeof StwOperationsDailyQuestsRouteRoute
+  '/stw-operations/dq-weapons': typeof StwOperationsDqWeaponsRouteRoute
   '/stw-operations/homebase-name': typeof StwOperationsHomebaseNameRouteRoute
   '/stw-operations/item-shop': typeof StwOperationsItemShopRouteRoute
   '/stw-operations/llama-manager': typeof StwOperationsLlamaManagerRouteRoute
   '/stw-operations/party': typeof StwOperationsPartyRouteRoute
   '/stw-operations/save-quests': typeof StwOperationsSaveQuestsRouteRoute
+  '/stw-operations/storm-shields': typeof StwOperationsStormShieldsRouteRoute
+  '/stw-operations/stw-shop': typeof StwOperationsStwShopRouteRoute
   '/stw-operations/taxi-service': typeof StwOperationsTaxiServiceRouteRoute
   '/stw-operations/unlock': typeof StwOperationsUnlockRouteRoute
   '/stw-operations/urns': typeof StwOperationsUrnsRouteRoute
@@ -217,6 +273,8 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/games-launcher': typeof GamesLauncherRouteRoute
   '/settings': typeof SettingsRouteRoute
+  '/account-management/account-export': typeof AccountManagementAccountExportRouteRoute
+  '/account-management/ban-status': typeof AccountManagementBanStatusRouteRoute
   '/account-management/devices-auth': typeof AccountManagementDevicesAuthRouteRoute
   '/account-management/epic-games-settings': typeof AccountManagementEpicGamesSettingsRouteRoute
   '/account-management/eula': typeof AccountManagementEulaRouteRoute
@@ -226,15 +284,20 @@ export interface FileRoutesByTo {
   '/advanced-mode/matchmaking-track': typeof AdvancedModeMatchmakingTrackRouteRoute
   '/advanced-mode/world-info': typeof AdvancedModeWorldInfoRouteRoute
   '/information/credits': typeof InformationCreditsRouteRoute
+  '/stw-operations/account-info': typeof StwOperationsAccountInfoRouteRoute
   '/stw-operations/auto-llamas': typeof StwOperationsAutoLlamasRouteRoute
   '/stw-operations/automation': typeof StwOperationsAutomationRouteRoute
+  '/stw-operations/cloud-storage': typeof StwOperationsCloudStorageRouteRoute
   '/stw-operations/collection-book': typeof StwOperationsCollectionBookRouteRoute
   '/stw-operations/daily-quests': typeof StwOperationsDailyQuestsRouteRoute
+  '/stw-operations/dq-weapons': typeof StwOperationsDqWeaponsRouteRoute
   '/stw-operations/homebase-name': typeof StwOperationsHomebaseNameRouteRoute
   '/stw-operations/item-shop': typeof StwOperationsItemShopRouteRoute
   '/stw-operations/llama-manager': typeof StwOperationsLlamaManagerRouteRoute
   '/stw-operations/party': typeof StwOperationsPartyRouteRoute
   '/stw-operations/save-quests': typeof StwOperationsSaveQuestsRouteRoute
+  '/stw-operations/storm-shields': typeof StwOperationsStormShieldsRouteRoute
+  '/stw-operations/stw-shop': typeof StwOperationsStwShopRouteRoute
   '/stw-operations/taxi-service': typeof StwOperationsTaxiServiceRouteRoute
   '/stw-operations/unlock': typeof StwOperationsUnlockRouteRoute
   '/stw-operations/urns': typeof StwOperationsUrnsRouteRoute
@@ -246,6 +309,8 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/games-launcher': typeof GamesLauncherRouteRoute
   '/settings': typeof SettingsRouteRoute
+  '/account-management/account-export': typeof AccountManagementAccountExportRouteRoute
+  '/account-management/ban-status': typeof AccountManagementBanStatusRouteRoute
   '/account-management/devices-auth': typeof AccountManagementDevicesAuthRouteRoute
   '/account-management/epic-games-settings': typeof AccountManagementEpicGamesSettingsRouteRoute
   '/account-management/eula': typeof AccountManagementEulaRouteRoute
@@ -255,15 +320,20 @@ export interface FileRoutesById {
   '/advanced-mode/matchmaking-track': typeof AdvancedModeMatchmakingTrackRouteRoute
   '/advanced-mode/world-info': typeof AdvancedModeWorldInfoRouteRoute
   '/information/credits': typeof InformationCreditsRouteRoute
+  '/stw-operations/account-info': typeof StwOperationsAccountInfoRouteRoute
   '/stw-operations/auto-llamas': typeof StwOperationsAutoLlamasRouteRoute
   '/stw-operations/automation': typeof StwOperationsAutomationRouteRoute
+  '/stw-operations/cloud-storage': typeof StwOperationsCloudStorageRouteRoute
   '/stw-operations/collection-book': typeof StwOperationsCollectionBookRouteRoute
   '/stw-operations/daily-quests': typeof StwOperationsDailyQuestsRouteRoute
+  '/stw-operations/dq-weapons': typeof StwOperationsDqWeaponsRouteRoute
   '/stw-operations/homebase-name': typeof StwOperationsHomebaseNameRouteRoute
   '/stw-operations/item-shop': typeof StwOperationsItemShopRouteRoute
   '/stw-operations/llama-manager': typeof StwOperationsLlamaManagerRouteRoute
   '/stw-operations/party': typeof StwOperationsPartyRouteRoute
   '/stw-operations/save-quests': typeof StwOperationsSaveQuestsRouteRoute
+  '/stw-operations/storm-shields': typeof StwOperationsStormShieldsRouteRoute
+  '/stw-operations/stw-shop': typeof StwOperationsStwShopRouteRoute
   '/stw-operations/taxi-service': typeof StwOperationsTaxiServiceRouteRoute
   '/stw-operations/unlock': typeof StwOperationsUnlockRouteRoute
   '/stw-operations/urns': typeof StwOperationsUrnsRouteRoute
@@ -276,6 +346,8 @@ export interface FileRouteTypes {
     | '/'
     | '/games-launcher'
     | '/settings'
+    | '/account-management/account-export'
+    | '/account-management/ban-status'
     | '/account-management/devices-auth'
     | '/account-management/epic-games-settings'
     | '/account-management/eula'
@@ -285,15 +357,20 @@ export interface FileRouteTypes {
     | '/advanced-mode/matchmaking-track'
     | '/advanced-mode/world-info'
     | '/information/credits'
+    | '/stw-operations/account-info'
     | '/stw-operations/auto-llamas'
     | '/stw-operations/automation'
+    | '/stw-operations/cloud-storage'
     | '/stw-operations/collection-book'
     | '/stw-operations/daily-quests'
+    | '/stw-operations/dq-weapons'
     | '/stw-operations/homebase-name'
     | '/stw-operations/item-shop'
     | '/stw-operations/llama-manager'
     | '/stw-operations/party'
     | '/stw-operations/save-quests'
+    | '/stw-operations/storm-shields'
+    | '/stw-operations/stw-shop'
     | '/stw-operations/taxi-service'
     | '/stw-operations/unlock'
     | '/stw-operations/urns'
@@ -304,6 +381,8 @@ export interface FileRouteTypes {
     | '/'
     | '/games-launcher'
     | '/settings'
+    | '/account-management/account-export'
+    | '/account-management/ban-status'
     | '/account-management/devices-auth'
     | '/account-management/epic-games-settings'
     | '/account-management/eula'
@@ -313,15 +392,20 @@ export interface FileRouteTypes {
     | '/advanced-mode/matchmaking-track'
     | '/advanced-mode/world-info'
     | '/information/credits'
+    | '/stw-operations/account-info'
     | '/stw-operations/auto-llamas'
     | '/stw-operations/automation'
+    | '/stw-operations/cloud-storage'
     | '/stw-operations/collection-book'
     | '/stw-operations/daily-quests'
+    | '/stw-operations/dq-weapons'
     | '/stw-operations/homebase-name'
     | '/stw-operations/item-shop'
     | '/stw-operations/llama-manager'
     | '/stw-operations/party'
     | '/stw-operations/save-quests'
+    | '/stw-operations/storm-shields'
+    | '/stw-operations/stw-shop'
     | '/stw-operations/taxi-service'
     | '/stw-operations/unlock'
     | '/stw-operations/urns'
@@ -332,6 +416,8 @@ export interface FileRouteTypes {
     | '/'
     | '/games-launcher'
     | '/settings'
+    | '/account-management/account-export'
+    | '/account-management/ban-status'
     | '/account-management/devices-auth'
     | '/account-management/epic-games-settings'
     | '/account-management/eula'
@@ -341,15 +427,20 @@ export interface FileRouteTypes {
     | '/advanced-mode/matchmaking-track'
     | '/advanced-mode/world-info'
     | '/information/credits'
+    | '/stw-operations/account-info'
     | '/stw-operations/auto-llamas'
     | '/stw-operations/automation'
+    | '/stw-operations/cloud-storage'
     | '/stw-operations/collection-book'
     | '/stw-operations/daily-quests'
+    | '/stw-operations/dq-weapons'
     | '/stw-operations/homebase-name'
     | '/stw-operations/item-shop'
     | '/stw-operations/llama-manager'
     | '/stw-operations/party'
     | '/stw-operations/save-quests'
+    | '/stw-operations/storm-shields'
+    | '/stw-operations/stw-shop'
     | '/stw-operations/taxi-service'
     | '/stw-operations/unlock'
     | '/stw-operations/urns'
@@ -361,6 +452,8 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   GamesLauncherRouteRoute: typeof GamesLauncherRouteRoute
   SettingsRouteRoute: typeof SettingsRouteRoute
+  AccountManagementAccountExportRouteRoute: typeof AccountManagementAccountExportRouteRoute
+  AccountManagementBanStatusRouteRoute: typeof AccountManagementBanStatusRouteRoute
   AccountManagementDevicesAuthRouteRoute: typeof AccountManagementDevicesAuthRouteRoute
   AccountManagementEpicGamesSettingsRouteRoute: typeof AccountManagementEpicGamesSettingsRouteRoute
   AccountManagementEulaRouteRoute: typeof AccountManagementEulaRouteRoute
@@ -370,15 +463,20 @@ export interface RootRouteChildren {
   AdvancedModeMatchmakingTrackRouteRoute: typeof AdvancedModeMatchmakingTrackRouteRoute
   AdvancedModeWorldInfoRouteRoute: typeof AdvancedModeWorldInfoRouteRoute
   InformationCreditsRouteRoute: typeof InformationCreditsRouteRoute
+  StwOperationsAccountInfoRouteRoute: typeof StwOperationsAccountInfoRouteRoute
   StwOperationsAutoLlamasRouteRoute: typeof StwOperationsAutoLlamasRouteRoute
   StwOperationsAutomationRouteRoute: typeof StwOperationsAutomationRouteRoute
+  StwOperationsCloudStorageRouteRoute: typeof StwOperationsCloudStorageRouteRoute
   StwOperationsCollectionBookRouteRoute: typeof StwOperationsCollectionBookRouteRoute
   StwOperationsDailyQuestsRouteRoute: typeof StwOperationsDailyQuestsRouteRoute
+  StwOperationsDqWeaponsRouteRoute: typeof StwOperationsDqWeaponsRouteRoute
   StwOperationsHomebaseNameRouteRoute: typeof StwOperationsHomebaseNameRouteRoute
   StwOperationsItemShopRouteRoute: typeof StwOperationsItemShopRouteRoute
   StwOperationsLlamaManagerRouteRoute: typeof StwOperationsLlamaManagerRouteRoute
   StwOperationsPartyRouteRoute: typeof StwOperationsPartyRouteRoute
   StwOperationsSaveQuestsRouteRoute: typeof StwOperationsSaveQuestsRouteRoute
+  StwOperationsStormShieldsRouteRoute: typeof StwOperationsStormShieldsRouteRoute
+  StwOperationsStwShopRouteRoute: typeof StwOperationsStwShopRouteRoute
   StwOperationsTaxiServiceRouteRoute: typeof StwOperationsTaxiServiceRouteRoute
   StwOperationsUnlockRouteRoute: typeof StwOperationsUnlockRouteRoute
   StwOperationsUrnsRouteRoute: typeof StwOperationsUrnsRouteRoute
@@ -407,6 +505,20 @@ declare module '@tanstack/react-router' {
       path: '/settings'
       fullPath: '/settings'
       preLoaderRoute: typeof SettingsRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/account-management/account-export': {
+      id: '/account-management/account-export'
+      path: '/account-management/account-export'
+      fullPath: '/account-management/account-export'
+      preLoaderRoute: typeof AccountManagementAccountExportRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/account-management/ban-status': {
+      id: '/account-management/ban-status'
+      path: '/account-management/ban-status'
+      fullPath: '/account-management/ban-status'
+      preLoaderRoute: typeof AccountManagementBanStatusRouteRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/account-management/devices-auth': {
@@ -472,6 +584,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof InformationCreditsRouteRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/stw-operations/account-info': {
+      id: '/stw-operations/account-info'
+      path: '/stw-operations/account-info'
+      fullPath: '/stw-operations/account-info'
+      preLoaderRoute: typeof StwOperationsAccountInfoRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/stw-operations/auto-llamas': {
       id: '/stw-operations/auto-llamas'
       path: '/stw-operations/auto-llamas'
@@ -486,6 +605,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof StwOperationsAutomationRouteRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/stw-operations/cloud-storage': {
+      id: '/stw-operations/cloud-storage'
+      path: '/stw-operations/cloud-storage'
+      fullPath: '/stw-operations/cloud-storage'
+      preLoaderRoute: typeof StwOperationsCloudStorageRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/stw-operations/collection-book': {
       id: '/stw-operations/collection-book'
       path: '/stw-operations/collection-book'
@@ -498,6 +624,13 @@ declare module '@tanstack/react-router' {
       path: '/stw-operations/daily-quests'
       fullPath: '/stw-operations/daily-quests'
       preLoaderRoute: typeof StwOperationsDailyQuestsRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/stw-operations/dq-weapons': {
+      id: '/stw-operations/dq-weapons'
+      path: '/stw-operations/dq-weapons'
+      fullPath: '/stw-operations/dq-weapons'
+      preLoaderRoute: typeof StwOperationsDqWeaponsRouteRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/stw-operations/homebase-name': {
@@ -533,6 +666,20 @@ declare module '@tanstack/react-router' {
       path: '/stw-operations/save-quests'
       fullPath: '/stw-operations/save-quests'
       preLoaderRoute: typeof StwOperationsSaveQuestsRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/stw-operations/storm-shields': {
+      id: '/stw-operations/storm-shields'
+      path: '/stw-operations/storm-shields'
+      fullPath: '/stw-operations/storm-shields'
+      preLoaderRoute: typeof StwOperationsStormShieldsRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/stw-operations/stw-shop': {
+      id: '/stw-operations/stw-shop'
+      path: '/stw-operations/stw-shop'
+      fullPath: '/stw-operations/stw-shop'
+      preLoaderRoute: typeof StwOperationsStwShopRouteRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/stw-operations/taxi-service': {
@@ -577,6 +724,9 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   GamesLauncherRouteRoute: GamesLauncherRouteRoute,
   SettingsRouteRoute: SettingsRouteRoute,
+  AccountManagementAccountExportRouteRoute:
+    AccountManagementAccountExportRouteRoute,
+  AccountManagementBanStatusRouteRoute: AccountManagementBanStatusRouteRoute,
   AccountManagementDevicesAuthRouteRoute:
     AccountManagementDevicesAuthRouteRoute,
   AccountManagementEpicGamesSettingsRouteRoute:
@@ -591,15 +741,20 @@ const rootRouteChildren: RootRouteChildren = {
     AdvancedModeMatchmakingTrackRouteRoute,
   AdvancedModeWorldInfoRouteRoute: AdvancedModeWorldInfoRouteRoute,
   InformationCreditsRouteRoute: InformationCreditsRouteRoute,
+  StwOperationsAccountInfoRouteRoute: StwOperationsAccountInfoRouteRoute,
   StwOperationsAutoLlamasRouteRoute: StwOperationsAutoLlamasRouteRoute,
   StwOperationsAutomationRouteRoute: StwOperationsAutomationRouteRoute,
+  StwOperationsCloudStorageRouteRoute: StwOperationsCloudStorageRouteRoute,
   StwOperationsCollectionBookRouteRoute: StwOperationsCollectionBookRouteRoute,
   StwOperationsDailyQuestsRouteRoute: StwOperationsDailyQuestsRouteRoute,
+  StwOperationsDqWeaponsRouteRoute: StwOperationsDqWeaponsRouteRoute,
   StwOperationsHomebaseNameRouteRoute: StwOperationsHomebaseNameRouteRoute,
   StwOperationsItemShopRouteRoute: StwOperationsItemShopRouteRoute,
   StwOperationsLlamaManagerRouteRoute: StwOperationsLlamaManagerRouteRoute,
   StwOperationsPartyRouteRoute: StwOperationsPartyRouteRoute,
   StwOperationsSaveQuestsRouteRoute: StwOperationsSaveQuestsRouteRoute,
+  StwOperationsStormShieldsRouteRoute: StwOperationsStormShieldsRouteRoute,
+  StwOperationsStwShopRouteRoute: StwOperationsStwShopRouteRoute,
   StwOperationsTaxiServiceRouteRoute: StwOperationsTaxiServiceRouteRoute,
   StwOperationsUnlockRouteRoute: StwOperationsUnlockRouteRoute,
   StwOperationsUrnsRouteRoute: StwOperationsUrnsRouteRoute,

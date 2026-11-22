@@ -10,13 +10,18 @@
       "party": "Grupo",
       "save-quests": "Guardar Progreso (Misiones)",
       "daily-quests": "Misiones Diarias",
+      "auto-daily-quests": "Auto Daily Quests",
+      "dq-weapons": "DQ Weapons",
+      "storm-shields": "Storm Shields",
       "homebase-name": "Nombre de la Base",
       "xp-boosts": "Potenciadores",
       "auto-pin-urns": "Auto-fijar Urnas",
       "auto-llamas": "Auto-llamas",
       "llama-manager": "Llama Manager",
       "item-shop": "Item Shop",
+      "stw-shop": "STW Shop",
       "collection-book": "Libro de colección",
+      "account-info": "Account Information",
       "unlock": "Desbloquear Recompensas de Escudos"
     },
     "auto-kick-status": {
@@ -28,6 +33,10 @@
     "title": "Administrar Cuenta",
     "options": {
       "vbucks-information": "Información de V-Bucks",
+      "cloud-storage": "Cloud Storage",
+      "account-export": "Account Export",
+      "ban-status": "Ban Status",
+      "sprites": "Sprites",
       "redeem-codes": "Reclamar Códigos",
       "devices-auth": "Autenticación de Dispositivos",
       "epic-settings": "Configuración de Epic Games"

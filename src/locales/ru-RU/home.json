@@ -79,6 +79,15 @@
       "error": "Не удалось загрузить Файл с World Info, проверьте, что выбран правильный файл и в нём нет пропущенных данных"
     }
   },
+  "check": {
+    "submit": "Check",
+    "all-vbucks": "All V-Bucks today ({{count}})",
+    "missions-placeholder": "Select missions",
+    "no-missions": "No alerts in today's World Info",
+    "no-vbucks": "No V-Bucks missions today. Turn off All V-Bucks and pick a mission.",
+    "empty": "Select accounts and missions, then check completions.",
+    "summary": "{{done}}/{{total}} done"
+  },
   "results": {
     "empty": {
       "alerts-done": "Найденные алерты не соответствуют ни одной из сегодняшних миссий",

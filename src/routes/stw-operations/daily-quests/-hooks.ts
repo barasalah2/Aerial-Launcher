@@ -1,7 +1,5 @@
-import type { DailyQuestsAccountData } from '../../../types/daily-quests'
-
-import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import { useShallow } from 'zustand/react/shallow'
 
 import { useAccountSelectorData } from '../../../components/selectors/accounts/hooks'
 
@@ -10,25 +8,30 @@ import {
   useGetDailyQuestsData,
 } from '../../../hooks/stw-operations/daily-quests'
 import { useGetAccounts } from '../../../hooks/accounts'
+import { useDailyQuestsStore } from '../../../state/stw-operations/daily-quests'
 
+import { describeDailyQuestClaim } from '../../../lib/stw/daily-quest-claim'
 import { toast } from '../../../lib/notifications'
 
 export function useDailyQuestsData() {
   const { t } = useTranslation(['stw-operations', 'general'])
 
-  const [isLoading, setIsLoading] = useState(false)
-  const [rerollingQuest, setRerollingQuest] = useState<
-    | {
-        accountId: string
-        questId: string
-      }
-    | null
-  >(null)
-  const [dailyQuests, setDailyQuests] = useState<
-    Array<DailyQuestsAccountData>
-  >([])
+  const { dailyQuests, isClaiming, isLoading, rerollingQuest } =
+    useDailyQuestsStore(
+      useShallow((state) => ({
+        dailyQuests: state.dailyQuests,
+        isClaiming: state.isClaiming,
+        isLoading: state.isLoading,
+        rerollingQuest: state.rerollingQuest,
+      })),
+    )
+  const setLoading = useDailyQuestsStore((state) => state.setLoading)
+  const setClaiming = useDailyQuestsStore((state) => state.setClaiming)
+  const setRerollingQuest = useDailyQuestsStore(
+    (state) => state.setRerollingQuest,
+  )
 
-  const { accountList } = useGetAccounts()
+  const { accountList, accountsArray } = useGetAccounts()
   const { selectedAccounts, selectedTags } = useGetDailyQuestsData()
   const { dailyQuestsUpdateAccounts, dailyQuestsUpdateTags } =
     useGetDailyQuestsActions()
@@ -47,52 +50,9 @@ export function useDailyQuestsData() {
   })
 
   const fetchButtonIsDisabled =
-    isSelectedEmpty || isLoading || !areThereAccounts
-  const rerollIsDisabled = rerollingQuest !== null || isLoading
-
-  useEffect(() => {
-    const listener = window.electronAPI.notificationDailyQuests(
-      async (value) => {
-        setIsLoading(false)
-        setDailyQuests(value)
-      }
-    )
-
-    return () => {
-      listener.removeListener()
-    }
-  }, [])
-
-  useEffect(() => {
-    const listener = window.electronAPI.notificationDailyQuestReroll(
-      async (response) => {
-        setRerollingQuest(null)
-
-        if (response.success) {
-          setDailyQuests((current) =>
-            current.map((item) =>
-              item.accountId === response.accountId
-                ? response.data
-                : item
-            )
-          )
-
-          toast(t('daily-quests.notifications.rerolled'))
-
-          return
-        }
-
-        toast(
-          response.errorMessage ??
-            t('daily-quests.notifications.failed')
-        )
-      }
-    )
-
-    return () => {
-      listener.removeListener()
-    }
-  }, [])
+    isSelectedEmpty || isLoading || isClaiming || !areThereAccounts
+  const claimAllDisabled = isClaiming || isLoading || accountsArray.length <= 0
+  const rerollIsDisabled = rerollingQuest !== null || isLoading || isClaiming
 
   const handleFetch = () => {
     if (fetchButtonIsDisabled) {
@@ -105,15 +65,32 @@ export function useDailyQuestsData() {
       toast(
         t('form.accounts.no-linked', {
           ns: 'general',
-        })
+        }),
       )
 
       return
     }
 
-    setIsLoading(true)
+    setLoading(true)
 
     window.electronAPI.requestDailyQuests(selectedAccounts)
+  }
+
+  const handleClaimAll = async () => {
+    if (claimAllDisabled) {
+      return
+    }
+
+    setClaiming(true)
+
+    try {
+      const summary = await window.electronAPI.claimAllDailyQuests()
+      toast(describeDailyQuestClaim(summary, (key, options) => t(key, options)))
+    } catch (error) {
+      toast(error instanceof Error ? error.message : String(error))
+    } finally {
+      setClaiming(false)
+    }
   }
 
   const handleReroll = (accountId: string, questId: string) => {
@@ -140,8 +117,10 @@ export function useDailyQuestsData() {
   return {
     accounts,
     accountList,
+    claimAllDisabled,
     dailyQuests,
     fetchButtonIsDisabled,
+    isClaiming,
     isLoading,
     parsedSelectedAccounts,
     parsedSelectedTags,
@@ -151,6 +130,7 @@ export function useDailyQuestsData() {
 
     dailyQuestsUpdateAccounts,
     dailyQuestsUpdateTags,
+    handleClaimAll,
     handleFetch,
     handleReroll,
   }

@@ -10,16 +10,7 @@ import {
 import { useGetAccounts } from '../../../hooks/accounts'
 
 import { toast } from '../../../lib/notifications'
-import type {
-  CollectionBookItem,
-  CollectionBookSectionId,
-  CollectionBookSlotRequest,
-  CollectionBookUpgradeRequest,
-} from '../../../types/collection-book'
-
-type CollectionBookPendingAction =
-  | { type: 'slot'; request: CollectionBookSlotRequest }
-  | { type: 'upgrade'; count: number; request: CollectionBookUpgradeRequest }
+import type { CollectionBookSlotRequest } from '../../../types/collection-book'
 
 export function useCollectionBookPage() {
   const { t } = useTranslation(['stw-operations', 'general'])
@@ -32,7 +23,6 @@ export function useCollectionBookPage() {
     isActing,
     data,
     lastResult,
-    targetLevel,
   } = useGetCollectionBookData()
   const {
     updateAccounts,
@@ -42,7 +32,6 @@ export function useCollectionBookPage() {
     updateData,
     clearData,
     setLastResult,
-    setTargetLevel,
   } = useGetCollectionBookActions()
 
   const {
@@ -57,9 +46,6 @@ export function useCollectionBookPage() {
     selectedAccounts: accounts,
     selectedTags: tags,
   })
-
-  const [pendingAction, setPendingAction] =
-    useState<CollectionBookPendingAction | null>(null)
 
   const isDisabledForm =
     isSelectedEmpty || isLoading || isActing || !areThereAccounts
@@ -85,34 +71,6 @@ export function useCollectionBookPage() {
       window.electronAPI.collectionBookActionResult(async (result) => {
         updateActing(false)
         setLastResult(result)
-
-        if (result.success) {
-          if (result.upgraded) {
-            toast(
-              t('collection-book.toasts.upgraded', {
-                count: result.upgraded,
-                failed: result.failed ?? 0,
-              }),
-            )
-          } else if (result.slotted) {
-            toast(
-              t('collection-book.toasts.slotted', {
-                count: result.slotted,
-              }),
-            )
-          } else {
-            toast(t('collection-book.toasts.success'))
-          }
-        } else {
-          const errorKey = `collection-book.toasts.error_${result.error ?? 'unknown'}`
-          toast(
-            t(errorKey, {
-              defaultValue: t('collection-book.toasts.error', {
-                context: result.error ?? 'unknown',
-              }),
-            }),
-          )
-        }
       })
 
     return () => {
@@ -120,7 +78,7 @@ export function useCollectionBookPage() {
       loadingListener.removeListener()
       resultListener.removeListener()
     }
-  }, [t, updateActing, updateData, updateLoading, setLastResult])
+  }, [updateActing, updateData, updateLoading, setLastResult])
 
   const handleLoad = () => {
     if (isDisabledForm) {
@@ -141,78 +99,53 @@ export function useCollectionBookPage() {
     window.electronAPI.collectionBookRequestData(selected)
   }
 
-  // Uses the same filter as the main process so the confirmation count matches
-  const requestUpgrade = (
-    request: CollectionBookUpgradeRequest,
-    items: Array<CollectionBookItem>,
+  const [pendingSlot, setPendingSlot] =
+    useState<CollectionBookSlotRequest | null>(null)
+
+  // The upgrade dialog already shows the cost before confirming
+  const handleUpgradeItems = (
+    accountId: string,
+    itemIds: Array<string>,
+    level: number,
   ) => {
-    const count = items.filter(
-      (item) => item.level < targetLevel && item.level < item.maxLevel,
-    ).length
-
-    if (isActing || count <= 0) return
-
-    setPendingAction({ type: 'upgrade', count, request })
-  }
-
-  const handleUpgradeAll = (accountId: string) => {
-    requestUpgrade(
-      { accountId, sectionId: 'all', targetLevel },
-      data[accountId]?.items ?? [],
-    )
+    if (isActing || itemIds.length <= 0) return
+    updateActing(true)
+    window.electronAPI.collectionBookUpgrade({
+      accountId,
+      itemIds,
+      targetLevel: level,
+    })
   }
 
   const handleUpgradeSection = (
     accountId: string,
-    sectionId: CollectionBookSectionId,
+    sectionId: string,
+    level: number,
   ) => {
-    requestUpgrade(
-      { accountId, sectionId, targetLevel },
-      (data[accountId]?.items ?? []).filter(
-        (item) => item.sectionId === sectionId,
-      ),
-    )
-  }
-
-  const handleUpgradeItem = (
-    accountId: string,
-    item: CollectionBookItem,
-  ) => {
-    requestUpgrade({ accountId, itemIds: [item.itemId], targetLevel }, [
-      item,
-    ])
-  }
-
-  const handleSlotItems = (
-    accountId: string,
-    items: Array<CollectionBookItem>,
-  ) => {
-    const itemIds = items
-      .filter((item) => !item.favorite)
-      .map((item) => item.itemId)
-
-    if (isActing || itemIds.length <= 0) return
-
-    setPendingAction({ type: 'slot', request: { accountId, itemIds } })
-  }
-
-  const confirmPendingAction = () => {
-    if (!pendingAction || isActing) return
-
+    if (isActing) return
     updateActing(true)
-
-    if (pendingAction.type === 'slot') {
-      window.electronAPI.collectionBookSlot(pendingAction.request)
-    } else {
-      window.electronAPI.collectionBookUpgrade(pendingAction.request)
-    }
-
-    setPendingAction(null)
+    window.electronAPI.collectionBookUpgrade({
+      accountId,
+      sectionId,
+      targetLevel: level,
+    })
   }
 
-  const cancelPendingAction = () => {
-    setPendingAction(null)
+  // Slotting is permanent (the item leaves the inventory), so it waits for
+  // a confirmation
+  const handleSlotItem = (accountId: string, itemId: string) => {
+    if (isActing) return
+    setPendingSlot({ accountId, itemIds: [itemId] })
   }
+
+  const confirmPendingSlot = () => {
+    if (!pendingSlot || isActing) return
+    updateActing(true)
+    window.electronAPI.collectionBookSlot(pendingSlot)
+    setPendingSlot(null)
+  }
+
+  const cancelPendingSlot = () => setPendingSlot(null)
 
   return {
     accountOptions,
@@ -226,18 +159,15 @@ export function useCollectionBookPage() {
     tagOptions,
     accountsData,
     lastResult,
-    targetLevel,
-    pendingAction,
 
     updateAccounts,
     updateTags,
-    setTargetLevel,
     handleLoad,
-    handleUpgradeAll,
     handleUpgradeSection,
-    handleUpgradeItem,
-    handleSlotItems,
-    confirmPendingAction,
-    cancelPendingAction,
+    handleUpgradeItems,
+    handleSlotItem,
+    pendingSlot,
+    confirmPendingSlot,
+    cancelPendingSlot,
   }
 }

@@ -16,6 +16,7 @@ import {
 import { ElectronAPIEventKeys } from '../../config/constants/main-process'
 
 import { AccountService } from '../core/automation/account-service'
+import { AutomationLogFile } from '../core/automation/log-file'
 import { MCPStorageTransfer } from '../core/mcp/storage-transfer'
 import { Authentication } from '../core/authentication'
 import { ClaimRewards } from '../core/claim-rewards'
@@ -86,6 +87,8 @@ export class Automation {
       automation,
       false,
     )
+
+    await AutomationLogFile.start()
   }
 
   static async addAccount(accountId: string) {
@@ -94,6 +97,7 @@ export class Automation {
       accountId,
       actions: {
         claim: false,
+        claimParty: false,
         kick: false,
         transferMats: false,
       },
@@ -475,29 +479,30 @@ export class Automation {
                   automationAccount.actions.kick ||
                   automationAccount.actions.claim
                 ) {
-                  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                  const tasks: Array<Promise<any>> = []
+                  const accounts = [...AccountsManager.getAccounts().values()]
+
+                  // Claim before kicking; a failed step must not skip the
+                  // next one or leave this check running
+                  if (automationAccount.actions.claim) {
+                    await (
+                      automationAccount.actions.claimParty
+                        ? Party.claimPartyMembers(account, accounts, {
+                            useGlobalNotification: true,
+                          })
+                        : ClaimRewards.start([account], true)
+                    ).catch((error) => {
+                      console.error('[Automation] Claim failed:', error)
+                    })
+                  }
 
                   if (automationAccount.actions.kick) {
-                    const accounts = AccountsManager.getAccounts()
-
-                    tasks.push(
-                      Party.kickPartyMembers(
-                        account,
-                        [...accounts.values()],
-                        automationAccount.actions.claim ?? false,
-                        {
-                          useGlobalNotification: true,
-                        },
-                      ),
-                    )
+                    await Party.kickPartyMembers(account, accounts, false, {
+                      useGlobalNotification: true,
+                    }).catch((error) => {
+                      console.error('[Automation] Kick failed:', error)
+                    })
                   }
 
-                  if (automationAccount.actions.claim) {
-                    tasks.push(ClaimRewards.start([account], true))
-                  }
-
-                  await Promise.allSettled(tasks)
                   this.clearActiveChecks([accountId])
                 } else if (automationAccount.actions.transferMats) {
                   this.clearActiveChecks([accountId])
@@ -621,6 +626,10 @@ export class Automation {
     if (automationAccount) {
       const actionsNewValueClaim =
         data.actions?.claim ?? automationAccount.actions.claim
+      const actionsNewValueClaimParty =
+        data.actions?.claimParty ??
+        automationAccount.actions.claimParty ??
+        false
       const actionsNewValueKick =
         data.actions?.kick ?? automationAccount.actions.kick
       const actionsNewValueTransferMats =
@@ -680,6 +689,7 @@ export class Automation {
         accountId,
         actions: {
           claim: actionsNewValueClaim,
+          claimParty: actionsNewValueClaimParty,
           kick: actionsNewValueKick,
           transferMats: actionsNewValueTransferMats,
         },
