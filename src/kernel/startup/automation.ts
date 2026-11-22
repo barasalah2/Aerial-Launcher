@@ -1,3 +1,4 @@
+import type { AccountData } from '../../types/accounts'
 import type {
   AutomationAccountData,
   AutomationAccountFileData,
@@ -66,6 +67,43 @@ export class Automation {
       Math.max(parsed, missionIntervalRange.min),
       missionIntervalRange.max,
     )
+  }
+
+  /**
+   * Claim before kicking. Each step catches its own error so a failed claim
+   * still kicks, and the caller's re-arm always runs.
+   */
+  static async claimThenKick(
+    account: AccountData,
+    actions: AutomationAccountData['actions'],
+  ) {
+    const accounts = [...AccountsManager.getAccounts().values()]
+
+    if (actions.claim) {
+      await (
+        actions.claimParty
+          ? Party.claimPartyMembers(account, accounts, {
+              useGlobalNotification: true,
+            })
+          : ClaimRewards.start([account], true)
+      ).catch((error) => {
+        console.error(
+          `[Automation] Claim failed for ${account.accountId}:`,
+          error,
+        )
+      })
+    }
+
+    if (actions.kick) {
+      await Party.kickPartyMembers(account, accounts, false, {
+        useGlobalNotification: true,
+      }).catch((error) => {
+        console.error(
+          `[Automation] Kick failed for ${account.accountId}:`,
+          error,
+        )
+      })
+    }
   }
 
   static async load() {
@@ -479,30 +517,10 @@ export class Automation {
                   automationAccount.actions.kick ||
                   automationAccount.actions.claim
                 ) {
-                  const accounts = [...AccountsManager.getAccounts().values()]
-
-                  // Claim before kicking; a failed step must not skip the
-                  // next one or leave this check running
-                  if (automationAccount.actions.claim) {
-                    await (
-                      automationAccount.actions.claimParty
-                        ? Party.claimPartyMembers(account, accounts, {
-                            useGlobalNotification: true,
-                          })
-                        : ClaimRewards.start([account], true)
-                    ).catch((error) => {
-                      console.error('[Automation] Claim failed:', error)
-                    })
-                  }
-
-                  if (automationAccount.actions.kick) {
-                    await Party.kickPartyMembers(account, accounts, false, {
-                      useGlobalNotification: true,
-                    }).catch((error) => {
-                      console.error('[Automation] Kick failed:', error)
-                    })
-                  }
-
+                  await Automation.claimThenKick(
+                    account,
+                    automationAccount.actions,
+                  )
                   this.clearActiveChecks([accountId])
                 } else if (automationAccount.actions.transferMats) {
                   this.clearActiveChecks([accountId])

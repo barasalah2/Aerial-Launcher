@@ -8,8 +8,6 @@ import { AccountsManager } from '../../../kernel/startup/accounts'
 import { Automation } from '../../../kernel/startup/automation'
 import { SettingsManager } from '../../../kernel/startup/settings'
 import { Authentication } from '../authentication'
-import { ClaimRewards } from '../claim-rewards'
-import { Party } from '../party'
 
 import { findPlayer } from '../../../services/endpoints/matchmaking'
 import { MCPStorageTransfer } from '../mcp/storage-transfer'
@@ -171,30 +169,10 @@ export class AccountProcess {
         automationAccount.actions.claim
       ) {
         this.clearMissionIntervalId()
-        const accounts = [...AccountsManager.getAccounts().values()]
-
-        // Claim before kicking; a failed step must not skip the next one or
-        // the re-arm below (that silently stopped automation until restart)
-        if (automationAccount.actions.claim) {
-          await (
-            automationAccount.actions.claimParty
-              ? Party.claimPartyMembers(currentAccount, accounts, {
-                  useGlobalNotification: true,
-                })
-              : ClaimRewards.start([currentAccount], true)
-          ).catch((error) => {
-            console.error(`[Automation] Claim failed for ${this.accountId}:`, error)
-          })
-        }
-
-        if (automationAccount.actions.kick) {
-          await Party.kickPartyMembers(currentAccount, accounts, false, {
-            useGlobalNotification: true,
-          }).catch((error) => {
-            console.error(`[Automation] Kick failed for ${this.accountId}:`, error)
-          })
-        }
-
+        await Automation.claimThenKick(
+          currentAccount,
+          automationAccount.actions,
+        )
         this.preInit({ timeout: 1_000 })
 
         this.setMatchmaking({

@@ -33,6 +33,8 @@ export function useCollectionBookPage() {
     clearData,
     setLastResult,
   } = useGetCollectionBookActions()
+  const [pendingSlot, setPendingSlot] =
+    useState<CollectionBookSlotRequest | null>(null)
 
   const {
     accounts: accountOptions,
@@ -98,9 +100,6 @@ export function useCollectionBookPage() {
     clearData()
     window.electronAPI.collectionBookRequestData(selected)
   }
-
-  const [pendingSlot, setPendingSlot] =
-    useState<CollectionBookSlotRequest | null>(null)
 
   // The upgrade dialog already shows the cost before confirming
   const handleUpgradeItems = (

@@ -227,9 +227,7 @@ function Content() {
 
       <Dialog
         open={pendingSlot !== null}
-        onOpenChange={(open) => {
-          if (!open) cancelPendingSlot()
-        }}
+        onOpenChange={(open) => !open && cancelPendingSlot()}
       >
         <DialogContent className="max-w-md">
           <DialogHeader>
@@ -241,10 +239,7 @@ function Content() {
             </DialogDescription>
           </DialogHeader>
           <DialogFooter className="gap-2 sm:gap-0">
-            <Button
-              variant="outline"
-              onClick={cancelPendingSlot}
-            >
+            <Button variant="outline" onClick={cancelPendingSlot}>
               {t('collection-book.confirm.cancel')}
             </Button>
             <Button
