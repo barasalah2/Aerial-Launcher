@@ -13,7 +13,7 @@
 
 This is [barasalah2/Aerial-Launcher](https://github.com/barasalah2/Aerial-Launcher), a fork of [Ciensprog/Aerial-Launcher](https://github.com/Ciensprog/Aerial-Launcher) 1.12.3. It fixes what broke with the Epic Games Launcher v2 update (October 2026) and adds features from [Mikro900ytpl's fork](https://github.com/Mikro900ytpl/Aerial-Launcher), which were reviewed and hardened before merging.
 
-**Download:** `Aerial.Launcher-1.13.1.Setup.exe` from this fork's [releases](https://github.com/barasalah2/Aerial-Launcher/releases). It uses the same data folder as the original (`%APPDATA%\aerial-launcher-data`), so your accounts and settings carry over.
+**Download:** `Aerial.Launcher-1.14.0.Setup.exe` from this fork's [releases](https://github.com/barasalah2/Aerial-Launcher/releases). It uses the same data folder as the original (`%APPDATA%\aerial-launcher-data`), so your accounts and settings carry over.
 
 > [!IMPORTANT]
 > Keep **Epic Games Launcher running** when you launch Fortnite from Aerial. With EGL v2 the game needs it, and Aerial tells you if it isn't running.
@@ -33,13 +33,25 @@ This is [barasalah2/Aerial-Launcher](https://github.com/barasalah2/Aerial-Launch
 - **Collection Book:** level heroes, schematics, defenders and survivors to a target level, and slot items into the Collection Book. Slotting is permanent, so it always asks first, and favorited items are never slotted.
 - **Item Shop:** browse the Battle Royale shop, set a creator code, buy and gift items. The confirmation shows the total across all selected accounts, and every offer is checked against Epic's own catalog and price before anything is sent.
 - **Party friend requests:** look up players (Epic, PSN, Xbox, Nintendo, Steam) and send or accept friend requests per account.
-- **Games Launcher:** launch your other installed Epic games with a selected account. Fortnite and Unreal Engine are excluded.
+- **Games Launcher:** launch your other installed Epic games with a selected account, with each game's icon. Fortnite and Unreal Engine are excluded.
+- **STW Shop:** buy items from the Save the World event and weekly shops.
+- **DQ Weapons:** find your schematics with 6 perks and chain lightning.
+- **Account Info, Storm Shields and Ban Status.** Homebase Name and Unlock are tabs on the Storm Shields page.
+- **Cloud Storage:** view your game settings files, download them, or copy them to other accounts.
+- **Account Export:** save an account's details to a file you choose. Tokens and secrets are removed.
+- **Auto-kick from the log file:** detect the end of a mission from Fortnite's log file. Every action is off until you turn it on.
+- **Daily Quests:** pick quests for Auto Daily Quests to replace, and claim for the whole party.
+- **Party status** and an **alerts-done checker**, the endurance wave on claimed rewards, and one history row per account claim.
+- **Settings > Appearance:** themes, STW zone accent colours, sidebar order and a compact sidebar.
+- **Japanese** translation.
+
+Left out on purpose: Mission swap, the custom proxy launch option, the copy-launch-command button and Sprites. They modify what the game sees or sign in as the Fortnite game client instead of using Epic's public API, which could get accounts banned.
 
 ### Privacy
 
 - Aerial talks to Epic's own servers (`*.epicgames.com`).
-- It also contacts [fortnite-api.com](https://fortnite-api.com), for the public Item Shop list and item icons, and this fork on GitHub, for update checks and images. No account data, tokens or names are sent to either.
-- Everything Aerial saves stays in `%APPDATA%\aerial-launcher-data`.
+- It also contacts [fortnite-api.com](https://fortnite-api.com) for the public Item Shop list and item icons, a public shop snapshot on GitHub when fortnite-api.com is down, `api.miadsc.xyz` for STW item images, and this fork on GitHub for update checks. No account data, tokens or names are sent to any of them.
+- Everything Aerial saves stays in `%APPDATA%\aerial-launcher-data`, except files you export or download yourself (Account Export, Cloud Storage, World Info), which go where you choose.
 
 > [!NOTE]
 > The in-app "new version" notice checks this fork's releases.
