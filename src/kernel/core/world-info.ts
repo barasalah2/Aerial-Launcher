@@ -17,6 +17,7 @@ import {
   writeFile,
 } from 'node:fs/promises'
 import path from 'node:path'
+import { AxiosError } from 'axios'
 import { dialog, shell } from 'electron'
 
 import { defaultWorldInfo } from '../../config/constants/fortnite/world-info'
@@ -304,35 +305,41 @@ export class WorldInfoManager {
   }
 
   /**
-   * Epic rejects client credentials tokens on world/info
+   * Epic rejects client credentials tokens on world/info, so use the first
+   * of up to 3 accounts that works: one broken account doesn't empty the
+   * home tab
    */
   private static async request(): Promise<WorldInfoResponse> {
-    try {
-      // Read from disk: on startup this runs before AccountsManager.load()
-      const [account] = (await DataDirectory.getAccountsFile()).accounts
-      const accessToken = account
-        ? await Authentication.verifyAccessToken(account)
-        : null
+    // Read from disk: on startup this runs before AccountsManager.load()
+    const { accounts } = await DataDirectory.getAccountsFile()
 
-      if (!accessToken) {
-        return { data: null, status: false }
+    for (const account of accounts.slice(0, 3)) {
+      try {
+        const accessToken = await Authentication.verifyAccessToken(account)
+
+        if (!accessToken) {
+          continue
+        }
+
+        const worldInfoResponse = await getWorldInfoData({ accessToken })
+
+        if (
+          !(worldInfoResponse.data.missionAlerts?.length > 0) ||
+          !(worldInfoResponse.data.missions?.length > 0) ||
+          !(worldInfoResponse.data.theaters?.length > 0)
+        ) {
+          return { data: defaultWorldInfo, status: true }
+        }
+
+        return { data: worldInfoResponse.data, status: true }
+      } catch (error) {
+        console.error(
+          `[WorldInfo] Request failed using account ${account.accountId}:`,
+          error instanceof AxiosError
+            ? `${error.response?.status} ${JSON.stringify(error.response?.data)}`
+            : error,
+        )
       }
-
-      const worldInfoResponse = await getWorldInfoData({ accessToken })
-
-      if (
-        worldInfoResponse.data.missionAlerts?.length <= 0 ||
-        worldInfoResponse.data.missions?.length <= 0 ||
-        worldInfoResponse.data.theaters?.length <= 0
-      ) {
-        return { data: defaultWorldInfo, status: true }
-      }
-
-      return { data: worldInfoResponse.data, status: true }
-
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    } catch (error) {
-      //
     }
 
     return { data: null, status: false }

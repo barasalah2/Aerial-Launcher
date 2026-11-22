@@ -131,14 +131,18 @@ export class FortniteLauncher {
         '-epicenv=Prod',
         '-EpicPortal',
         // '-steamimportavailable',
-        `-epicusername="${account.displayName}"`,
+        // The command goes through cmd.exe: strip characters that would
+        // break out of the quoted argument or be interpreted by the shell
+        `-epicusername="${`${account.displayName ?? ''}`.replace(/["^&|<>%\r\n]/g, '')}"`,
         `-epicuserid=${account.accountId}`,
         // '-epiclocale=en',
         // '-epicsandboxid=fn',
       ].join(' ')
 
-      childProcess.exec(command, {
-        cwd: settings.path,
+      childProcess.exec(command, { cwd: settings.path }, (error) => {
+        if (error) {
+          console.error('[FortniteLauncher] Failed to start game:', error)
+        }
       })
 
       MainWindow.instance.webContents.send(
@@ -150,10 +154,8 @@ export class FortniteLauncher {
       )
 
       return
-
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (error) {
-      //
+      console.error('[FortniteLauncher] Launch failed:', error)
     }
 
     sendError()

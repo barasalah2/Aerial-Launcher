@@ -84,7 +84,7 @@ export class DataDirectory {
     missionInterval: `${defaultMissionInterval}`,
     path: 'C:\\Program Files\\Epic Games\\Fortnite\\FortniteGame\\Binaries\\Win64',
     systemTray: false,
-    userAgent: 'Fortnite/++Fortnite+Release-34.40-CL-41753727-Windows',
+    userAgent: 'Fortnite/++Fortnite+Release-43.10-CL-60118918-Windows',
   }
 
   private static devSettingsFilePath = path.join(

@@ -7,6 +7,8 @@ import { Manifest } from '../../kernel/core/manifest'
  */
 
 export const presenceService = axios.create({
+  // Without a timeout a hung request blocks bulk operations forever
+  timeout: 30_000,
   baseURL:
     'https://presence-public-service-prod.ol.epicgames.com/presence/api/v1/_',
 })
