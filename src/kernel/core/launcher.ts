@@ -133,7 +133,7 @@ export class FortniteLauncher {
         // '-steamimportavailable',
         // The command goes through cmd.exe: strip characters that would
         // break out of the quoted argument or be interpreted by the shell
-        `-epicusername="${`${account.displayName ?? ''}`.replace(/["^&|<>%\r\n]/g, '')}"`,
+        `-epicusername="${account.displayName.replace(/["^&|<>%\r\n]/g, '')}"`,
         `-epicuserid=${account.accountId}`,
         // '-epiclocale=en',
         // '-epicsandboxid=fn',

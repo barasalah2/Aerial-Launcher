@@ -153,8 +153,11 @@ function getIconExe(exePath: string) {
           lower !== exeName
         )
       })
-      .map((file) => path.join(directory, file))
-      .map((filePath) => ({ filePath, size: statSync(filePath).size }))
+      .map((file) => {
+        const filePath = path.join(directory, file)
+
+        return { filePath, size: statSync(filePath).size }
+      })
       .sort((a, b) => b.size - a.size)[0]
 
     return largest && largest.size > exeSize ? largest.filePath : exePath

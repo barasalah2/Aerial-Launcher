@@ -321,17 +321,17 @@ export class WorldInfoManager {
           continue
         }
 
-        const worldInfoResponse = await getWorldInfoData({ accessToken })
+        const { data } = await getWorldInfoData({ accessToken })
 
         if (
-          !(worldInfoResponse.data.missionAlerts?.length > 0) ||
-          !(worldInfoResponse.data.missions?.length > 0) ||
-          !(worldInfoResponse.data.theaters?.length > 0)
+          !(data.missionAlerts?.length > 0) ||
+          !(data.missions?.length > 0) ||
+          !(data.theaters?.length > 0)
         ) {
           return { data: defaultWorldInfo, status: true }
         }
 
-        return { data: worldInfoResponse.data, status: true }
+        return { data, status: true }
       } catch (error) {
         console.error(
           `[WorldInfo] Request failed using account ${account.accountId}:`,
