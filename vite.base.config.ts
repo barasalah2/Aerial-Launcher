@@ -1,4 +1,4 @@
-import type { UserConfig } from 'vite'
+import type { Rolldown, UserConfig } from 'vite'
 
 import path from 'node:path'
 import { TanStackRouterVite } from '@tanstack/router-vite-plugin'
@@ -10,23 +10,27 @@ import { TanStackRouterVite } from '@tanstack/router-vite-plugin'
  */
 export const nativeModules = ['node-process-watcher']
 
+// Suppress "Module level directives cause errors when bundled" warnings
+export function onwarn(
+  warning: Rolldown.RolldownLog,
+  warn: Rolldown.LoggingFunction,
+): void {
+  if (warning.code === 'MODULE_LEVEL_DIRECTIVE') {
+    return
+  }
+
+  warn(warning)
+}
+
 /**
- * Shared by the main process and preload builds, the Forge Vite plugin
- * provides the rest (entry, output format and file names, defines)
+ * Main process and preload builds, on top of the Forge Vite plugin defaults
  */
 export const nodeBuildConfig: UserConfig = {
   build: {
     chunkSizeWarningLimit: 2000,
     rollupOptions: {
       external: nativeModules,
-      onwarn(warning, warn) {
-        // Suppress "Module level directives cause errors when bundled" warnings
-        if (warning.code === 'MODULE_LEVEL_DIRECTIVE') {
-          return
-        }
-
-        warn(warning)
-      },
+      onwarn,
     },
   },
   plugins: [TanStackRouterVite()],

@@ -24,7 +24,7 @@ const config: ForgeConfig = {
     // The Vite plugin only packages the .vite folder: add the native modules
     // left out of the bundle, so they get rebuilt for Electron.
     // node-process-watcher builds against node-addon-api without declaring it
-    packageAfterCopy: async (_forgeConfig, buildPath) => {
+    async packageAfterCopy(_forgeConfig, buildPath) {
       for (const name of [...nativeModules, 'node-addon-api']) {
         cpSync(
           path.join(__dirname, 'node_modules', name),
@@ -43,11 +43,8 @@ const config: ForgeConfig = {
   plugins: [
     new VitePlugin({
       hotRestart: true,
-      // `build` can specify multiple entry builds, which can be Main process, Preload scripts, Worker process, etc.
-      // If you are familiar with Vite configuration, it will look really familiar.
       build: [
         {
-          // `entry` is just an alias for `build.lib.entry` in the corresponding file of `config`.
           entry: 'src/kernel/main.ts',
           config: 'vite.main.config.ts',
         },
