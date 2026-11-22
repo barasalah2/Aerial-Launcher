@@ -1,4 +1,3 @@
-import type { FilterOptionOption } from 'react-select/dist/declarations/src/filters'
 import type { StylesConfig } from 'react-select'
 
 import chroma, { contrast } from 'chroma-js'
@@ -16,7 +15,7 @@ export type SelectOption = {
 
 export type SelectCustomFilter =
   | ((
-      candidate: FilterOptionOption<SelectOption>,
+      candidate: { label: string; value: string; data: SelectOption },
       input: string
     ) => boolean)
   | null

@@ -1,5 +1,8 @@
 import type { ForgeConfig } from '@electron-forge/shared-types'
 
+import { cpSync } from 'node:fs'
+import path from 'node:path'
+
 import { MakerSquirrel } from '@electron-forge/maker-squirrel'
 import { FusesPlugin } from '@electron-forge/plugin-fuses'
 import { VitePlugin } from '@electron-forge/plugin-vite'
@@ -9,6 +12,7 @@ import {
   repositoryOwner,
   repositoryRawURL,
 } from './src/config/about/links'
+import { nativeModules } from './vite.base.config'
 
 const config: ForgeConfig = {
   packagerConfig: {
@@ -16,6 +20,20 @@ const config: ForgeConfig = {
     icon: 'icon-transparent.ico',
   },
   rebuildConfig: {},
+  hooks: {
+    // The Vite plugin only packages the .vite folder: add the native modules
+    // left out of the bundle, so they get rebuilt for Electron.
+    // node-process-watcher builds against node-addon-api without declaring it
+    packageAfterCopy: async (_forgeConfig, buildPath) => {
+      for (const name of [...nativeModules, 'node-addon-api']) {
+        cpSync(
+          path.join(__dirname, 'node_modules', name),
+          path.join(buildPath, 'node_modules', name),
+          { recursive: true },
+        )
+      }
+    },
+  },
   makers: [
     new MakerSquirrel({
       iconUrl: `${repositoryRawURL}/icon-transparent.ico`,
@@ -24,6 +42,7 @@ const config: ForgeConfig = {
   ],
   plugins: [
     new VitePlugin({
+      hotRestart: true,
       // `build` can specify multiple entry builds, which can be Main process, Preload scripts, Worker process, etc.
       // If you are familiar with Vite configuration, it will look really familiar.
       build: [
@@ -35,6 +54,7 @@ const config: ForgeConfig = {
         {
           entry: 'src/kernel/preload.ts',
           config: 'vite.preload.config.ts',
+          target: 'preload',
         },
       ],
       renderer: [

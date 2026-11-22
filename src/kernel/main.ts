@@ -139,7 +139,7 @@ void (() => {
       minWidth: 600,
       webPreferences: {
         devTools: !app.isPackaged,
-        preload: path.join(__dirname, 'preload.js'),
+        preload: path.join(__dirname, 'preload.cjs'),
         spellcheck: false,
       },
     })

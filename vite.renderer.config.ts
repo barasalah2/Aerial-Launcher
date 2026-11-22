@@ -1,37 +1,18 @@
-import type { ConfigEnv, UserConfig } from 'vite'
-
 import { defineConfig } from 'vite'
 
-import { pluginExposeRenderer } from './vite.base.config'
-
 // https://vitejs.dev/config
-export default defineConfig((env) => {
-  const forgeEnv = env as ConfigEnv<'renderer'>
-  const { root, mode, forgeConfigSelf } = forgeEnv
-  const name = forgeConfigSelf.name ?? ''
+export default defineConfig({
+  build: {
+    chunkSizeWarningLimit: 2000,
+    rollupOptions: {
+      onwarn(warning, warn) {
+        // Suppress "Module level directives cause errors when bundled" warnings
+        if (warning.code === 'MODULE_LEVEL_DIRECTIVE') {
+          return
+        }
 
-  return {
-    root,
-    mode,
-    base: './',
-    build: {
-      chunkSizeWarningLimit: 2000,
-      outDir: `.vite/renderer/${name}`,
-      rollupOptions: {
-        onwarn(warning, warn) {
-          // Suppress "Module level directives cause errors when bundled" warnings
-          if (warning.code === 'MODULE_LEVEL_DIRECTIVE') {
-            return
-          }
-
-          warn(warning)
-        },
+        warn(warning)
       },
     },
-    plugins: [pluginExposeRenderer(name)],
-    resolve: {
-      preserveSymlinks: true,
-    },
-    clearScreen: false,
-  } as UserConfig
+  },
 })
