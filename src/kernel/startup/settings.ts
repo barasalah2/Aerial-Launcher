@@ -104,7 +104,13 @@ export class SettingsManager {
     return settings
   }
 
-  static async update(settings: Settings) {
+  static async update(newSettings: Partial<Settings>) {
+    // Merge so a save that omits a key doesn't drop it from settings.json
+    const settings: Required<Settings> = {
+      ...(await SettingsManager.getData()),
+      ...newSettings,
+    }
+
     if (
       settings.systemTray !== undefined &&
       SystemTray.isActive !== settings.systemTray

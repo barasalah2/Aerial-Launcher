@@ -43,8 +43,7 @@
       },
       "tray": {
         "label": "Спрятать в трей"
-      },
-      "epic-games-dir": {}
+      }
     }
   },
   "custom-menu": {

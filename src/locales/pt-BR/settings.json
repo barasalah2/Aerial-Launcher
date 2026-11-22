@@ -43,8 +43,7 @@
       },
       "tray": {
         "label": "Ocultar na bandeja do sistema"
-      },
-      "epic-games-dir": {}
+      }
     }
   },
   "custom-menu": {

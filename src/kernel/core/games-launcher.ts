@@ -92,7 +92,7 @@ export class GamesLauncher {
           `-epicapp=${game.appName}`,
           '-epicenv=Prod',
           '-EpicPortal',
-          `-epicsandboxid=${game.namespace}`,
+          ...(game.namespace ? [`-epicsandboxid=${game.namespace}`] : []),
           `-epicusername=${parseCustomDisplayName(account)}`,
           `-epicuserid=${account.accountId}`,
         ],

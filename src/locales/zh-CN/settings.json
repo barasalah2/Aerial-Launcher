@@ -43,8 +43,7 @@
       },
       "tray": {
         "label": "隐藏到系统托盘"
-      },
-      "epic-games-dir": {}
+      }
     }
   },
   "custom-menu": {

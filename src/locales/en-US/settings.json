@@ -43,8 +43,7 @@
       },
       "tray": {
         "label": "Hide to system tray"
-      },
-      "epic-games-dir": {}
+      }
     }
   },
   "custom-menu": {

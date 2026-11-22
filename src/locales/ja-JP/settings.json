@@ -72,9 +72,6 @@
       },
       "tray": {
         "label": "システムトレイに隠す"
-      },
-      "epic-games-dir": {
-        "label": "Epic Games フォルダー"
       }
     }
   },
